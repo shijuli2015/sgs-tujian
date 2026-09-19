@@ -1,0 +1,2 @@
+Pillow>=9.0
+pypinyin>=0.49

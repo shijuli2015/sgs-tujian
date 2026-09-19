@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+# source exports are large; keep them outside the repo and pass --src
+*.png
+!static/*.png

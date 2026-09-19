@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>骁武 · 威吕布模拟器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#ece3d3; --paper:#f8f1e1; --ink:#1f1712; --muted:#76665a;
+  --red:#9e1f1a; --gold:#b08a3e; --line:#d2c1a3; --chip:#fbf6ea;
+  --basic:#9e1f1a; --trick:#2f5d7a; --weapon:#8a3d12; --armor:#3e6b45;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#15110d; --paper:#211b15; --ink:#efe4cf; --muted:#a8977c;
+    --red:#e0564a; --gold:#d6b064; --line:#3e3428; --chip:#2a231b;
+    --basic:#e0564a; --trick:#7eaed0; --weapon:#e0955a; --armor:#86b98e;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15110d; --paper:#211b15; --ink:#efe4cf; --muted:#a8977c;
+  --red:#e0564a; --gold:#d6b064; --line:#3e3428; --chip:#2a231b;
+  --basic:#e0564a; --trick:#7eaed0; --weapon:#e0955a; --armor:#86b98e;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Noto Serif SC","Songti SC","SimSun",serif;line-height:1.6}
+main{max-width:720px;margin:0 auto;padding:28px 18px 48px}
+h1{font-family:"ZCOOL XiaoWei","Noto Serif SC",serif;font-weight:400;
+  font-size:clamp(2.2rem,8vw,3.4rem);margin:0;letter-spacing:.12em;color:var(--red);line-height:1.1}
+.sub{color:var(--muted);margin:6px 0 22px;font-size:.95rem}
+.skill{border-left:3px solid var(--red);padding:10px 14px;background:var(--paper);
+  font-size:.92rem;margin-bottom:22px;border-radius:0 6px 6px 0}
+.skill b{color:var(--red)}
+.section-title{font-weight:600;margin:0 0 10px;font-size:1rem}
+
+.status{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 10px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.78rem}
+.stat strong{font-size:1.1rem}
+.stat.on strong{color:var(--red)}
+
+.actions{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:8px}
+button{font:inherit;cursor:pointer}
+.btn{padding:12px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--chip);color:var(--ink);
+  font-size:.95rem;font-weight:600}
+.btn.main{background:var(--red);color:#fff8ec;border:none;font-size:1.2rem;font-weight:900;letter-spacing:.3em;
+  box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.btn.main:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.log-line{color:var(--muted);font-size:.85rem;text-align:center;min-height:1.4em;margin:6px 0 0}
+
+.stage{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin:22px 0 22px;min-height:250px}
+.card{width:170px;height:240px;border-radius:12px;background:var(--paper);border:2px solid var(--c,var(--line));
+  box-shadow:0 8px 24px rgba(0,0,0,.18);position:relative;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:14px;text-align:center}
+.card.empty{border-style:dashed;color:var(--muted);box-shadow:none;font-size:.9rem}
+.card .type{position:absolute;top:10px;left:12px;font-size:.78rem;color:var(--c);font-weight:600}
+.card .range{position:absolute;top:10px;right:12px;font-size:.78rem;color:var(--muted)}
+.card .name{font-family:"ZCOOL XiaoWei","Noto Serif SC",serif;font-size:1.9rem;color:var(--c);
+  writing-mode:vertical-rl;letter-spacing:.15em;line-height:1.1;max-height:160px}
+.card .free{position:absolute;bottom:10px;left:10px;font-size:.7rem;color:var(--muted);border:1px solid var(--line);
+  padding:0 5px;border-radius:4px}
+.card .seal{position:absolute;bottom:10px;right:10px;width:34px;height:34px;border:2px solid var(--red);color:var(--red);
+  border-radius:4px;font-size:.72rem;line-height:1.05;display:flex;align-items:center;justify-content:center;transform:rotate(-8deg);font-weight:900}
+.flip{animation:flip .45s ease both}
+@keyframes flip{from{transform:rotateY(90deg) scale(.9);opacity:.2}to{transform:none;opacity:1}}
+
+.pool{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:.9rem;margin-bottom:22px}
+.pool ol{margin:0;padding-left:1.6em}
+.pool li{margin:3px 0}
+.pool li b{color:var(--c)}
+.pool li span{color:var(--muted);font-size:.82rem}
+.pool p{margin:8px 0 0;color:var(--muted);font-size:.82rem}
+.hist ol{margin:0;padding-left:1.6em;font-size:.92rem}
+.hist li{margin:2px 0}
+.hist li em{font-style:normal;color:var(--muted);font-size:.82rem}
+.link{background:none;border:none;color:var(--muted);text-decoration:underline;font-size:.88rem;padding:0;margin-left:8px}
+</style>
+</head>
+<body>
+<main>
+  <h1>骁武</h1>
+  <p class="sub">威吕布 · 技能模拟器（4v4 牌库）</p>
+
+  <div class="skill">出牌阶段限一次，你可以<b>弃置一张牌摸一张牌</b>，该牌视为<b>随机一张牌面信息中有“【杀】”的牌</b>（以此法获得的牌使用时不计入次数），然后当你<b>下一次造成伤害后</b>，此技能视为未发动过且本回合获得的牌数改为<b>2</b>。</div>
+
+  <div class="status">
+    <div class="stat" id="stUsed"><small>本阶段</small><strong>可发动</strong></div>
+    <div class="stat" id="stCount"><small>获得牌数</small><strong>1</strong></div>
+    <div class="stat" id="stPending"><small>伤害重置</small><strong>未挂起</strong></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn main" id="use">骁 武</button>
+    <button class="btn" id="dmg">造成伤害</button>
+    <button class="btn" id="turn">新回合</button>
+  </div>
+  <p class="log-line" id="log">&nbsp;</p>
+
+  <div class="stage" id="stage"><div class="card empty">点击「骁武」发动</div></div>
+
+  <p class="section-title">随机池（牌面信息含【杀】）</p>
+  <div class="pool">
+    <ol id="pool"></ol>
+    <p>按牌表张数加权：从 166 张牌中含【杀】字的 95 张里等概率抽一张。</p>
+  </div>
+
+  <div class="hist">
+    <p class="section-title">记录<button class="link" id="clear">清除</button></p>
+    <ol id="hist" reversed></ol>
+  </div>
+</main>
+<script>
+// 张数统计自 4v4 牌表（共 166 张），含【杀】字的牌共 95 张，按张数加权
+const DECK = [
+  {name:"杀", disp:"杀",   tag:"普通杀", type:"基本牌", c:"--basic", n:30},
+  {name:"杀", disp:"火杀", tag:"火杀",   type:"基本牌", c:"--basic", n:5},
+  {name:"杀", disp:"雷杀", tag:"雷杀",   type:"基本牌", c:"--basic", n:5},
+  {name:"杀", disp:"冰杀", tag:"冰杀",   type:"基本牌", c:"--basic", n:4},
+  {name:"闪",       type:"基本牌", c:"--basic", n:23},
+  {name:"酒",       type:"基本牌", c:"--basic", n:5},
+  {name:"决斗",     type:"锦囊牌", c:"--trick", n:3},
+  {name:"南蛮入侵", type:"锦囊牌", c:"--trick", n:3},
+  {name:"借刀杀人", type:"锦囊牌", c:"--trick", n:2},
+  {name:"诸葛连弩",   type:"武器", range:1, c:"--weapon", n:2},
+  {name:"古锭刀",     type:"武器", range:2, c:"--weapon", n:1},
+  {name:"雌雄双股剑", type:"武器", range:2, c:"--weapon", n:1},
+  {name:"倚天剑",     type:"武器", range:2, c:"--weapon", n:1},
+  {name:"青釭剑",     type:"武器", range:2, c:"--weapon", n:1},
+  {name:"青龙偃月刀", type:"武器", range:3, c:"--weapon", n:1},
+  {name:"丈八蛇矛",   type:"武器", range:3, c:"--weapon", n:1},
+  {name:"贯石斧",     type:"武器", range:3, c:"--weapon", n:1},
+  {name:"三尖两刃刀", type:"武器", range:3, c:"--weapon", n:1},
+  {name:"方天画戟",   type:"武器", range:4, c:"--weapon", n:1},
+  {name:"五行鹤翎扇", type:"武器", range:4, c:"--weapon", n:1},
+  {name:"姬神弓",     type:"武器", range:5, c:"--weapon", n:1},
+  {name:"仁王盾", type:"防具", c:"--armor", n:1},
+  {name:"藤甲",   type:"防具", c:"--armor", n:1},
+];
+const TOTAL = DECK.reduce((a,d)=>a+d.n,0);
+const $ = s => document.querySelector(s);
+const rnd = n => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; };
+const pct = k => (k/TOTAL*100).toFixed(1) + "%";
+
+const GROUPS = [
+  ["【杀】", "--basic", DECK.slice(0,4)],
+  ["【闪】", "--basic", [DECK[4]]],
+  ["【酒】", "--basic", [DECK[5]]],
+  ["【决斗】", "--trick", [DECK[6]]],
+  ["【南蛮入侵】", "--trick", [DECK[7]]],
+  ["【借刀杀人】", "--trick", [DECK[8]]],
+  ["武器牌", "--weapon", DECK.filter(d=>d.type==="武器")],
+  ["【仁王盾】", "--armor", [DECK[DECK.length-2]]],
+  ["【藤甲】", "--armor", [DECK[DECK.length-1]]],
+];
+$("#pool").innerHTML = GROUPS.map(([label,c,items]) => {
+  const k = items.reduce((a,d)=>a+d.n,0);
+  const detail = items.length > 1 ? " · " + items.map(d=>`${d.disp||d.name}×${d.n}`).join("、") : "";
+  return `<li style="--c:var(${c})"><b>${label}</b> ${k} 张 · ${pct(k)} <span>${detail}</span></li>`;
+}).join("");
+
+let used = false, pending = false, count = 1, n = 0;
+
+function render(){
+  $("#stUsed").className = "stat" + (used ? "" : " on");
+  $("#stUsed strong").textContent = used ? "已发动" : "可发动";
+  $("#stCount").className = "stat" + (count === 2 ? " on" : "");
+  $("#stCount strong").textContent = count;
+  $("#stPending").className = "stat" + (pending ? " on" : "");
+  $("#stPending strong").textContent = pending ? "待触发" : "未挂起";
+  $("#use").disabled = used;
+}
+
+function roll(){
+  let r = rnd(TOTAL);
+  for (const d of DECK) { if (r < d.n) return d; r -= d.n; }
+}
+
+$("#use").onclick = () => {
+  if (used) return;
+  const got = Array.from({length:count}, roll);
+  const stage = $("#stage");
+  stage.innerHTML = got.map((g,i) => `
+    <div class="card flip" style="--c:var(${g.c});animation-delay:${i*0.12}s">
+      <span class="type">${g.tag || g.type}</span>
+      ${g.range ? `<span class="range">攻击范围 ${g.range}</span>` : ""}
+      <span class="name">${g.disp || g.name}</span>
+      <span class="free">不计次数</span>
+      <span class="seal">骁<br>武</span>
+    </div>`).join("");
+  used = true; pending = true;
+  const names = got.map(g => `【${g.disp || g.name}】`).join("、");
+  $("#log").textContent = `弃一摸${count}，视为 ${names}；下一次造成伤害后重置`;
+  n++;
+  $("#hist").insertAdjacentHTML("afterbegin",
+    `<li value="${n}">${got.map(g => `<span style="color:var(${g.c})">${g.disp || g.name}</span>`).join("、")} <em>摸${count}</em></li>`);
+  render();
+};
+
+$("#dmg").onclick = () => {
+  if (pending) {
+    pending = false; used = false; count = 2;
+    $("#log").textContent = "造成伤害：骁武视为未发动过，本回合获得牌数改为 2";
+  } else {
+    $("#log").textContent = "造成伤害：无挂起的重置效果";
+  }
+  render();
+};
+
+$("#turn").onclick = () => {
+  used = false; count = 1;
+  $("#log").textContent = pending ? "新回合：可发动，获得牌数 1（上次发动的伤害重置仍待触发）" : "新回合：可发动，获得牌数 1";
+  $("#stage").innerHTML = `<div class="card empty">点击「骁武」发动</div>`;
+  render();
+};
+
+$("#clear").onclick = () => { $("#hist").innerHTML = ""; n = 0; };
+render();
+</script>
+</body>
+</html>

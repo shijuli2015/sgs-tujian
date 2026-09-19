@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{PAGE_TITLE}} · 三国杀 DIY 武将图鉴</title>
+<meta name="description" content="{{DESCRIPTION}}">
+<meta property="og:title" content="{{PAGE_TITLE}}">
+<meta property="og:description" content="{{DESCRIPTION}}">
+<link rel="icon" href="{{ROOT}}assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="{{ROOT}}assets/style.css">
+<script src="{{ROOT}}assets/common.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="{{ROOT}}"><span class="logo-mark">杀</span>DIY 武将图鉴<small>身份局</small></a>
+    <nav class="nav" aria-label="主导航"><a href="{{ROOT}}">武将</a><a href="{{ROOT}}tools/">模拟器</a></nav>
+    <form class="search" action="{{ROOT}}" method="get" role="search">
+      <label class="sr-only" for="q">搜索武将</label>
+      <span class="icon" aria-hidden="true">⌕</span>
+      <input id="q" name="q" type="search" autocomplete="off" placeholder="名称、拼音、首字母、称号或技能…" enterkeyhint="search">
+      <kbd>Ctrl K</kbd>
+    </form>
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="切换明暗主题">☀</button>
+  </div>
+</header>
+
+<main>
+  <a class="back" href="{{ROOT}}">← 返回武将图鉴</a>
+  <article class="detail">
+    <div class="card-col">
+      {{IMAGE}}
+      <p class="hint">点击卡面查看大图</p>
+    </div>
+    <div>
+      <div class="dhead">
+        <span class="kb k-{{KINGDOM}}">{{KINGDOM_NAME}}</span>
+        <h1>{{NAME}}</h1>
+        {{HP}}
+        {{KIND_BADGE}}
+      </div>
+      <p class="dtitle">{{TITLE}}</p>
+      <dl class="meta">{{META}}</dl>
+      <div class="skills">{{SKILLS}}</div>
+      {{QUOTE}}
+      <div class="related">{{RELATED}}</div>
+      <nav class="pager" aria-label="翻页">
+        <a class="prev" href="{{PREV}}"><small>← 上一张</small>{{PREV_NAME}}</a>
+        <a class="next" href="{{NEXT}}"><small>下一张 →</small>{{NEXT_NAME}}</a>
+      </nav>
+    </div>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">
+    <span>非官方爱好者项目，代码以 MIT 协议开源。卡面图片与“三国杀”相关名称版权归游卡桌游及原画师所有。</span>
+    <span>快捷键：← → 翻页，<kbd>Ctrl K</kbd> 搜索。</span>
+  </div>
+</footer>
+</body>
+</html>

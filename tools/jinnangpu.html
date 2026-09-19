@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三国时代 · 锦囊谱</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37; --gold-light: #f4e4a6; --vermillion: #e34234; --ink: #1a1a1a;
+            --paper: #f5f0e1; --paper-dark: #e8dcc8; --jade: #00a86b; --azure: #3b5998; --purple: #6b4984;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #2c1810 0%, #1a0f0a 50%, #0d0705 100%);
+            min-height: 100vh; padding: 40px 20px; position: relative; overflow-x: hidden;
+        }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(227, 66, 52, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .container { max-width: 900px; margin: 0 auto; position: relative; }
+        .title-section { text-align: center; margin-bottom: 50px; position: relative; }
+        .title-section::before, .title-section::after {
+            content: '❖'; position: absolute; top: 50%; transform: translateY(-50%);
+            color: var(--gold); font-size: 24px; opacity: 0.6;
+        }
+        .title-section::before { left: 10%; }
+        .title-section::after { right: 10%; }
+        .main-title {
+            font-family: 'Ma Shan Zheng', cursive; font-size: 4rem; color: var(--gold);
+            text-shadow: 0 0 40px rgba(212, 175, 55, 0.4), 2px 2px 4px rgba(0, 0, 0, 0.8);
+            letter-spacing: 0.3em; margin-bottom: 10px;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 40px rgba(212, 175, 55, 0.4), 2px 2px 4px rgba(0, 0, 0, 0.8); }
+            to { text-shadow: 0 0 60px rgba(212, 175, 55, 0.6), 2px 2px 4px rgba(0, 0, 0, 0.8); }
+        }
+        .subtitle { font-size: 1rem; color: var(--gold-light); letter-spacing: 0.5em; opacity: 0.8; }
+        .era-card {
+            background: linear-gradient(145deg, var(--paper) 0%, var(--paper-dark) 100%);
+            border-radius: 8px; margin-bottom: 24px; position: relative; overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transform: translateY(0); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .era-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 30px rgba(212, 175, 55, 0.1);
+        }
+        .era-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--vermillion), var(--gold), var(--vermillion));
+        }
+        .era-card::after {
+            content: ''; position: absolute; top: 0; right: 0; width: 120px; height: 120px;
+            background: radial-gradient(circle at top right, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .era-header { display: flex; align-items: center; padding: 20px 24px; border-bottom: 1px solid rgba(0, 0, 0, 0.1); position: relative; }
+        .era-number {
+            font-family: 'Ma Shan Zheng', cursive; font-size: 3rem; color: var(--vermillion); opacity: 0.15;
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%); line-height: 1;
+        }
+        .era-title { font-family: 'Ma Shan Zheng', cursive; font-size: 2rem; color: var(--ink); margin-right: 16px; position: relative; }
+        .era-title::after {
+            content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, var(--vermillion), transparent);
+        }
+        .era-years {
+            font-size: 0.95rem; color: #666; background: rgba(0, 0, 0, 0.05);
+            padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .era-content { padding: 20px 24px; }
+        .era-desc { font-size: 0.9rem; color: #555; line-height: 1.8; margin-bottom: 16px; padding-left: 12px; border-left: 2px solid var(--gold); }
+        .jinang-section { display: flex; gap: 12px; flex-wrap: wrap; }
+        .jinang-label { font-size: 0.8rem; color: #888; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; width: 100%; }
+        .jinang-label::before { content: '◈'; color: var(--gold); }
+        .jinang-tag {
+            display: inline-flex; align-items: center; padding: 8px 16px; border-radius: 4px;
+            font-size: 0.95rem; font-weight: 600; position: relative; overflow: hidden;
+            transition: all 0.3s ease; cursor: pointer; user-select: none;
+        }
+        .jinang-tag::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        .jinang-tag:hover::before { left: 100%; }
+        .jinang-tag:hover { transform: scale(1.05); }
+        .jinang-tag:active { transform: scale(0.98); }
+        .jinang-basic { background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%); color: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
+        .jinang-strategy { background: linear-gradient(135deg, #c9302c 0%, #8b0000 100%); color: #fff; box-shadow: 0 2px 8px rgba(139, 0, 0, 0.4); }
+        .jinang-delay { background: linear-gradient(135deg, #2e8b57 0%, #1a5235 100%); color: #fff; box-shadow: 0 2px 8px rgba(30, 82, 53, 0.4); }
+        .jinang-special { background: linear-gradient(135deg, var(--gold) 0%, #b8860b 100%); color: #1a1a1a; box-shadow: 0 2px 8px rgba(212, 175, 55, 0.5); }
+        .tooltip {
+            position: fixed; background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%); color: #f5f0e1;
+            padding: 16px 20px; border-radius: 8px; font-size: 0.9rem; line-height: 1.7; max-width: 360px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(212, 175, 55, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            z-index: 1000; opacity: 0; transform: translateY(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none;
+        }
+        .tooltip.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .tooltip::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--vermillion), var(--gold), var(--vermillion));
+            border-radius: 8px 8px 0 0;
+        }
+        .tooltip-title { font-family: 'Ma Shan Zheng', cursive; font-size: 1.4rem; color: var(--gold); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .tooltip-title::before { content: '【'; color: var(--vermillion); }
+        .tooltip-title::after { content: '】'; color: var(--vermillion); }
+        .tooltip-content { color: #ccc; font-size: 0.85rem; }
+        .decoration { text-align: center; padding: 30px 0; color: var(--gold); opacity: 0.4; font-size: 1.5rem; letter-spacing: 1em; }
+        .footer { text-align: center; padding: 40px 20px; color: var(--gold-light); opacity: 0.6; font-size: 0.85rem; }
+        .footer-divider { width: 200px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 0 auto 20px; }
+        .era-card { opacity: 0; transform: translateY(30px); animation: cardFadeIn 0.6s ease forwards; }
+        @keyframes cardFadeIn { to { opacity: 1; transform: translateY(0); } }
+        .era-card:nth-child(1) { animation-delay: 0.1s; }
+        .era-card:nth-child(2) { animation-delay: 0.15s; }
+        .era-card:nth-child(3) { animation-delay: 0.2s; }
+        .era-card:nth-child(4) { animation-delay: 0.25s; }
+        .era-card:nth-child(5) { animation-delay: 0.3s; }
+        .era-card:nth-child(6) { animation-delay: 0.35s; }
+        .era-card:nth-child(7) { animation-delay: 0.4s; }
+        .era-card:nth-child(8) { animation-delay: 0.45s; }
+        .era-card:nth-child(9) { animation-delay: 0.5s; }
+        @media (max-width: 600px) {
+            .main-title { font-size: 2.5rem; letter-spacing: 0.15em; }
+            .era-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .era-number { display: none; }
+            .jinang-tag { padding: 6px 12px; font-size: 0.85rem; }
+            .tooltip { max-width: 280px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title-section">
+            <h1 class="main-title">三国时代</h1>
+            <p class="subtitle">锦囊谱 · 东汉末年至西晋统一</p>
+        </div>
+
+        <div class="era-card">
+            <span class="era-number">壹</span>
+            <div class="era-header"><h2 class="era-title">黄巾之乱</h2><span class="era-years">184年 - 189年</span></div>
+            <div class="era-content">
+                <p class="era-desc">张角以「苍天已死，黄天当立」号召起义，刘关张桃园结义，各地豪杰乘势崛起。</p>
+                <div class="jinang-section">
+                    <span class="jinang-label">相关锦囊</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="桃园结义">桃园结义</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="趁火打劫">趁火打劫</span>
+                    <span class="jinang-tag jinang-special" data-jinang="逐鹿天下">逐鹿天下</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="era-card">
+            <span class="era-number">贰</span>
+            <div class="era-header"><h2 class="era-title">诸侯伐董</h2><span class="era-years">189年 - 192年</span></div>
+            <div class="era-content">
+                <p class="era-desc">董卓专权乱政，十八路诸侯会盟讨伐，终至董卓迁都长安，后为吕布所杀。</p>
+                <div class="jinang-section">
+                    <span class="jinang-label">相关锦囊</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="决斗">决斗</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="推心置腹">推心置腹</span>
+                    <span class="jinang-tag jinang-special" data-jinang="联军盛宴">联军盛宴</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="era-card">
+            <span class="era-number">叁</span>
+            <div class="era-header"><h2 class="era-title">群雄并立</h2><span class="era-years">192年 - 200年</span></div>
+            <div class="era-content">
+                <p class="era-desc">曹操迎献帝挟天子以令诸侯，吕布覆灭、袁术称帝败亡，天下群雄混战兼并。</p>
+                <div class="jinang-section">
+                    <span class="jinang-label">相关锦囊</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="逐近弃远">逐近弃远</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="李代桃僵">李代桃僵</span>
+                    <span class="jinang-tag jinang-special" data-jinang="望梅止渴">望梅止渴</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="era-card">
+            <span class="era-number">肆</span>
+            <div class="era-header"><h2 class="era-title">官渡之战</h2><span class="era-years">200年 - 207年</span></div>
+            <div class="era-content">
+                <p class="era-desc">曹操以少胜多大败袁绍于官渡，奠定北方霸业，逐步统一黄河流域。</p>
+                <div class="jinang-section">
+                    <span class="jinang-label">相关锦囊</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="借刀杀人">借刀杀人</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="万箭齐发">万箭齐发</span>
+                    <span class="jinang-tag jinang-special" data-jinang="洞烛先机">洞烛先机</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="era-card">
+            <span class="era-number">伍</span>
+            <div class="era-header"><h2 class="era-title">赤壁之战</h2><span class="era-years">208年 - 209年</span></div>
+            <div class="era-content">
+                <p class="era-desc">孙刘联军于赤壁以火攻大破曹军，曹操南下一统天下的野望破灭，三分格局初定。</p>
+                <div class="jinang-section">
+                    <span class="jinang-label">相关锦囊</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="铁锁连环">铁锁连环</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="火攻">火攻</span>
+                    <span class="jinang-tag jinang-special" data-jinang="无中生有">无中生有</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="era-card">
+            <span class="era-number">陆</span>
+            <div class="era-header"><h2 class="era-title">入蜀汉中</h2><span class="era-years">211年 - 219年</span></div>
+            <div class="era-content">
+                <p class="era-desc">刘备入川取益州，后与曹操争夺汉中，黄忠斩夏侯渊，刘备进位汉中王。</p>
+                <div class="jinang-section">
+                    <span class="jinang-label">相关锦囊</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="以逸待劳">以逸待劳</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="出其不意">出其不意</span>
+                    <span class="jinang-tag jinang-special" data-jinang="调虎离山">调虎离山</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="era-card">
+            <span class="era-number">柒</span>
+            <div class="era-header"><h2 class="era-title">风云突变</h2><span class="era-years">219年 - 222年</span></div>
+            <div class="era-content">
+                <p class="era-desc">关羽水淹七军威震华夏，却遭吕蒙白衣渡江袭取荆州，败走麦城；刘备伐吴，夷陵遭陆逊火烧连营。</p>
+                <div class="jinang-section">
+                    <span class="jinang-label">相关锦囊</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="水淹七军">水淹七军</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="火烧连营">火烧连营</span>
+                    <span class="jinang-tag jinang-special" data-jinang="白衣渡江">白衣渡江</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="era-card">
+            <span class="era-number">捌</span>
+            <div class="era-header"><h2 class="era-title">北伐中原</h2><span class="era-years">228年 - 263年</span></div>
+            <div class="era-content">
+                <p class="era-desc">诸葛亮六出祁山、姜维九伐中原，蜀汉与曹魏数十年拉锯，南中平叛稳固后方。</p>
+                <div class="jinang-section">
+                    <span class="jinang-label">相关锦囊</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="南蛮入侵">南蛮入侵</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="解甲归田">解甲归田</span>
+                    <span class="jinang-tag jinang-special" data-jinang="斗转星移">斗转星移</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="era-card">
+            <span class="era-number">玖</span>
+            <div class="era-header"><h2 class="era-title">三分归一</h2><span class="era-years">263年 - 280年</span></div>
+            <div class="era-content">
+                <p class="era-desc">263年邓艾偷渡阴平灭蜀，265年司马炎代魏建晋，280年王濬楼船下益州，吴主孙皓出降，天下归一。</p>
+                <div class="jinang-section">
+                    <span class="jinang-label">相关锦囊</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="五谷丰登">五谷丰登</span>
+                    <span class="jinang-tag jinang-strategy" data-jinang="瞒天过海">瞒天过海</span>
+                    <span class="jinang-tag jinang-special" data-jinang="兵临城下">兵临城下</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="decoration">— ◆ —</div>
+
+        <div class="footer">
+            <div class="footer-divider"></div>
+            <p>三国杀 · 锦囊技能卡</p>
+            <p style="margin-top: 8px; font-size: 0.75rem;">东汉末年 184年 — 西晋统一 280年</p>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip">
+        <div class="tooltip-title" id="tooltip-title"></div>
+        <div class="tooltip-content" id="tooltip-content"></div>
+    </div>
+
+    <script>
+        const jinangEffects = {
+            "趁火打劫": "出牌阶段，对一名其他角色使用。你展示目标角色一张手牌，令其选择将此牌交给你或受到你造成的1点伤害。",
+            "推心置腹": "出牌阶段，对距离为1的一名其他角色使用。你获得目标角色区域里的至多两张牌，将等量的手牌交给其。",
+            "洞烛先机": "出牌阶段，对你使用。目标角色观看牌堆顶的两张牌，以任意顺序置于牌堆顶或牌堆底，然后摸两张牌。",
+            "逐近弃远": "出牌阶段，对一名其他角色使用。若你与其距离大于1，你弃置其区域内一张牌；若你与其距离等于1，你获得其区域内一张牌。",
+            "水淹七军": "出牌阶段，对一名装备区里有牌的其他角色使用。其选择一项：1.弃置装备区里的所有牌；2.你对其造成1点雷电伤害。",
+            "出其不意": "出牌阶段，对一名有手牌的角色使用。你展示其一张手牌，若此牌与【出其不意】花色不同，其受到1点伤害。",
+            "兵临城下": "出牌阶段，对一名其他角色使用。你亮出牌堆顶的四张牌，然后依次对目标角色使用其中的【杀】，并将其余的牌置于牌堆顶。",
+            "瞒天过海": "出牌阶段，对一至两名区域内有牌的其他角色使用。你依次获得目标角色区域内的一张牌，然后依次交给目标角色一张牌。",
+            "解甲归田": "出牌阶段，对装备区有牌的角色使用。目标角色将立即获得其装备区内的所有牌。",
+            "斗转星移": "出牌阶段，对一名体力值大于你的角色使用。其失去1点体力，你回复1点体力。",
+            "李代桃僵": "出牌阶段，对一名手牌数大于你的角色使用。其需交给你X张手牌（X为其与你手牌数之差的一半且向上取整）。",
+            "联军盛宴": "出牌阶段，你选择一个其他势力，对你和该势力的所有角色使用。你选择一项：1.回复X点体力；2.摸X张牌（X为该势力存活角色数）。然后该势力的每名目标角色各摸一张牌且重置其武将牌。",
+            "望梅止渴": "出牌阶段，对一名角色使用。直到该角色的回合结束，他手牌区域的♣牌均视为【桃】。",
+            "逐鹿天下": "出牌阶段，对所有角色使用。从牌堆和弃牌堆中亮出等同于目标角色数的装备牌，目标角色将其中一张置于其装备区里。",
+            "调虎离山": "出牌阶段，对一至两名其他角色使用。目标角色于此回合内体力值不会改变，不计入距离和座次的计算，不能使用牌且不是牌的合法目标。",
+            "白衣渡江": "出牌阶段，你令一名目标角色将手牌摸至与手牌最多的角色相同，或令其将手牌弃置至与手牌最少的角色相同。",
+            "火烧连营": "出牌阶段，对你的下家和与其处于同一队列的所有角色使用。每名角色受到你造成的1点火焰伤害。",
+            "以逸待劳": "出牌阶段，对你和与你势力相同的所有角色使用。每名目标角色依次摸两张牌并弃置两张牌。",
+            "桃园结义": "出牌阶段，对所有角色使用。每名目标角色回复1点体力。",
+            "决斗": "出牌阶段，对一名其他角色使用。由目标角色开始，你与其轮流打出一张【杀】，直到其中一方未打出【杀】。未打出【杀】的一方受到另一方造成的1点伤害。",
+            "借刀杀人": "出牌阶段，对装备区里有武器牌且攻击范围内有【杀】的合法目标的一名其他角色使用。令目标角色对你指定的角色使用一张【杀】，否则将装备区里的武器牌交给你。",
+            "万箭齐发": "出牌阶段，对所有其他角色使用。每名目标角色需打出一张【闪】，否则受到你造成的1点伤害。",
+            "铁锁连环": "出牌阶段，对一至两名角色使用。目标角色横置或重置其武将牌。",
+            "火攻": "出牌阶段，对一名有手牌的角色使用。目标角色展示一张手牌，你可以弃置一张与所展示牌花色相同的手牌对其造成1点火焰伤害。",
+            "无中生有": "出牌阶段，对你使用。目标角色摸两张牌。",
+            "南蛮入侵": "出牌阶段，对所有其他角色使用。每名目标角色需打出一张【杀】，否则受到你造成的1点伤害。",
+            "五谷丰登": "出牌阶段，对所有角色使用。你从牌堆顶亮出等同于目标角色数的牌，每名目标角色获得其中一张牌。"
+        };
+
+        const tooltip = document.getElementById('tooltip');
+        const tooltipTitle = document.getElementById('tooltip-title');
+        const tooltipContent = document.getElementById('tooltip-content');
+        let activeTag = null;
+
+        document.querySelectorAll('.jinang-tag').forEach(tag => {
+            tag.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const jinangName = this.getAttribute('data-jinang');
+                const effect = jinangEffects[jinangName] || '效果待补充...';
+                if (activeTag === this && tooltip.classList.contains('active')) {
+                    tooltip.classList.remove('active');
+                    activeTag = null;
+                    return;
+                }
+                activeTag = this;
+                tooltipTitle.textContent = jinangName;
+                tooltipContent.textContent = effect;
+                const rect = this.getBoundingClientRect();
+                let left = rect.left + (rect.width / 2) - 180;
+                let top = rect.bottom + 10;
+                if (left < 10) left = 10;
+                if (left + 360 > window.innerWidth) left = window.innerWidth - 370;
+                if (top + 200 > window.innerHeight) top = rect.top - 10 - 150;
+                tooltip.style.left = left + 'px';
+                tooltip.style.top = top + 'px';
+                tooltip.classList.add('active');
+            });
+        });
+
+        document.addEventListener('click', function() {
+            tooltip.classList.remove('active');
+            activeTag = null;
+        });
+
+        tooltip.addEventListener('click', function(e) { e.stopPropagation(); });
+    </script>
+</body>
+</html>

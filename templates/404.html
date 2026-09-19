@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>找不到页面 · 三国杀 DIY 武将图鉴</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #121015; color: #ece6da;
+    font: 16px/1.6 "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; text-align: center; }
+  a { color: #f0cf85; }
+  b { display: block; font-size: 64px; font-family: "STKaiti", "KaiTi", serif; color: #d6503f; }
+</style>
+</head>
+<body>
+  <div><b>闪</b><p>这张牌被【闪】掉了，页面不存在。</p><p><a id="home" href="/">返回武将图鉴</a></p></div>
+  <script>
+    // GitHub Pages project sites live under /<repo>/, so "/" would leave the site
+    if (/\.github\.io$/.test(location.hostname)) {
+      var seg = location.pathname.split("/")[1];
+      if (seg) document.getElementById("home").href = "/" + seg + "/";
+    }
+  </script>
+</body>
+</html>

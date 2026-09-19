@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三国杀 - 关羽【武佑】技能选择器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px;
+        }
+        .container { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); padding: 40px; max-width: 900px; width: 100%; }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 30px; font-size: 2.5em; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        .skill-info { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .skill-info h2 { margin-bottom: 10px; }
+        .button-container { text-align: center; margin-bottom: 30px; }
+        .random-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none;
+            padding: 15px 50px; font-size: 1.3em; border-radius: 50px; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-weight: bold;
+        }
+        .random-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+        .random-btn:active { transform: translateY(0); }
+        .result-container { display: none; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .result-title { color: #2c3e50; font-size: 1.5em; margin-bottom: 20px; text-align: center; }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .card-item {
+            background: white; border: 3px solid #667eea; border-radius: 15px; padding: 15px; text-align: center;
+            transition: all 0.3s ease; cursor: pointer; animation: cardAppear 0.5s ease; position: relative;
+        }
+        .card-item.selected { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; transform: scale(1.05); box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4); }
+        .card-item.selected::after { content: '✓'; position: absolute; top: 5px; right: 10px; font-size: 1.5em; color: white; }
+        @keyframes cardAppear { from { opacity: 0; transform: scale(0.8) rotateY(90deg); } to { opacity: 1; transform: scale(1) rotateY(0); } }
+        .card-item:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .card-name { font-size: 1.3em; font-weight: bold; margin-bottom: 8px; }
+        .card-type { font-size: 0.9em; opacity: 0.8; }
+        .effects-section { background: #f8f9fa; border-radius: 15px; padding: 20px; max-height: 400px; overflow-y: auto; }
+        .effects-title { color: #2c3e50; font-size: 1.3em; margin-bottom: 15px; text-align: center; }
+        .effect-item { background: white; border-left: 4px solid #667eea; padding: 10px 15px; margin-bottom: 10px; border-radius: 5px; transition: all 0.3s ease; }
+        .effect-item:hover { transform: translateX(5px); box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+        .effect-name { font-weight: bold; color: #667eea; display: inline-block; min-width: 80px; }
+        .effect-desc { color: #555; }
+        .effects-section::-webkit-scrollbar { width: 8px; }
+        .effects-section::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .effects-section::-webkit-scrollbar-thumb { background: #667eea; border-radius: 10px; }
+        .effects-section::-webkit-scrollbar-thumb:hover { background: #764ba2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 三国杀 - 关羽【武佑】技能选择器</h1>
+
+        <div class="skill-info">
+            <h2>【武佑】技能说明</h2>
+            <p><strong>每名角色的出牌阶段限一次：</strong></p>
+            <p>• 其他角色可以交给你一张手牌（若为你则跳过此步骤）</p>
+            <p>• 你选择一张手牌并观看5个随机非装备牌名</p>
+            <p>• 你可以选择其中1个牌名（【杀】记录属性）并将此牌交给其（若为你则跳过）</p>
+            <p>• 此牌于其手牌区内视为你选择牌名的牌，其使用此牌无距离和次数限制</p>
+        </div>
+
+        <div class="button-container">
+            <button class="random-btn" onclick="randomSelect()">🎲 查看5个随机牌名</button>
+        </div>
+
+        <div class="result-container" id="resultContainer">
+            <h3 class="result-title">✨ 可选择的牌名（选择其中1个）</h3>
+            <div class="cards-grid" id="cardsGrid"></div>
+
+            <div class="effects-section">
+                <h3 class="effects-title">📜 选中牌的效果说明</h3>
+                <div id="effectsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cards = {
+            '杀': { type: '基本牌', effect: '对一名角色造成1点伤害' },
+            '闪': { type: '基本牌', effect: '抵消杀的效果' },
+            '桃': { type: '基本牌', effect: '回复1点体力' },
+            '酒': { type: '基本牌', effect: '本回合使用的下一张杀伤害+1，或濒死时回复1点体力' },
+            '桃园结义': { type: '锦囊牌', effect: '所有角色回复1点体力' },
+            '五谷丰登': { type: '锦囊牌', effect: '亮出等同于角色数量的牌，每名角色依次选择并获得其中一张' },
+            '南蛮入侵': { type: '锦囊牌', effect: '所有其他角色需打出一张杀，否则受到1点伤害' },
+            '万箭齐发': { type: '锦囊牌', effect: '所有其他角色需打出一张闪，否则受到1点伤害' },
+            '铁索连环': { type: '锦囊牌', effect: '可重铸（弃此牌摸一张）或横置/重置至多两名角色' },
+            '过河拆桥': { type: '锦囊牌', effect: '弃置一名其他角色的一张牌' },
+            '顺手牵羊': { type: '锦囊牌', effect: '获得距离为1的角色的一张牌' },
+            '借刀杀人': { type: '锦囊牌', effect: '令有武器的角色对你指定的角色使用一张杀' },
+            '无中生有': { type: '锦囊牌', effect: '摸两张牌' },
+            '无懈可击': { type: '锦囊牌', effect: '抵消一张锦囊牌的效果' },
+            '乐不思蜀': { type: '延时锦囊', effect: '跳过出牌阶段' },
+            '兵粮寸断': { type: '延时锦囊', effect: '跳过摸牌阶段' },
+            '闪电': { type: '延时锦囊', effect: '判定，若为黑桃2-9则造成3点雷电伤害' },
+            '决斗': { type: '锦囊牌', effect: '目标角色与你轮流打出杀，先不出杀的受到1点伤害' },
+            '火攻': { type: '锦囊牌', effect: '展示手牌，弃置相同花色的牌造成1点火焰伤害' },
+            '调虎离山': { type: '锦囊牌', effect: '对一至两名角色使用，直到回合结束，目标不计入距离和座次，不能使用牌且不能成为牌的目标' },
+            '逐近弃远': { type: '锦囊牌', effect: '距离大于1时弃置目标区域一张牌；距离等于1时获得目标区域一张牌' },
+            '知己知彼': { type: '锦囊牌', effect: '观看目标角色的手牌或一张暗置的武将牌' },
+            '联军盛宴': { type: '锦囊牌', effect: '选择一个势力，该势力每名角色摸一张牌并重置。你可选择回复体力或摸牌，总数为该势力存活角色数' },
+            '出其不意': { type: '锦囊牌', effect: '展示目标一张手牌，若花色与出其不意不同，其受到1点伤害' },
+            '洞烛先机': { type: '锦囊牌', effect: '对自己使用，卜算2，然后摸两张牌' },
+            '水淹七军': { type: '锦囊牌', effect: '对至多两名角色使用，第一名受到1点雷电伤害并弃一张牌，其余受到1点雷电伤害并摸一张牌' },
+            '国无懈可击': { type: '锦囊牌', effect: '抵消锦囊对该角色或同势力未结算角色的效果' }
+        };
+
+        let selectedCard = null;
+
+        function randomSelect() {
+            const cardNames = Object.keys(cards);
+            const selectedCards = [];
+            selectedCard = null;
+            while (selectedCards.length < 5) {
+                const cardName = cardNames[Math.floor(Math.random() * cardNames.length)];
+                if (!selectedCards.includes(cardName)) selectedCards.push(cardName);
+            }
+            displayResults(selectedCards);
+        }
+
+        function selectCard(cardName, cardElement) {
+            document.querySelectorAll('.card-item').forEach(card => card.classList.remove('selected'));
+            cardElement.classList.add('selected');
+            selectedCard = cardName;
+            updateSelectedInfo(cardName);
+        }
+
+        function updateSelectedInfo(cardName) {
+            const card = cards[cardName];
+            if (!document.getElementById('selectedInfo')) {
+                const infoDiv = document.createElement('div');
+                infoDiv.id = 'selectedInfo';
+                infoDiv.style.cssText = `
+                    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                    color: white; padding: 20px; border-radius: 15px; margin-top: 20px;
+                    text-align: center; font-size: 1.2em; animation: fadeIn 0.3s;
+                `;
+                document.getElementById('resultContainer').appendChild(infoDiv);
+            }
+            document.getElementById('selectedInfo').innerHTML = `
+                <h3 style="margin-bottom: 10px;">已选择：【${cardName}】</h3>
+                <p>此牌将视为【${cardName}】使用，无距离和次数限制</p>
+                <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.9;">${card.effect}</p>
+            `;
+        }
+
+        function displayResults(selectedCards) {
+            const resultContainer = document.getElementById('resultContainer');
+            const cardsGrid = document.getElementById('cardsGrid');
+            const effectsList = document.getElementById('effectsList');
+
+            cardsGrid.innerHTML = '';
+            effectsList.innerHTML = '';
+            const oldInfo = document.getElementById('selectedInfo');
+            if (oldInfo) oldInfo.remove();
+            const oldTip = document.getElementById('selectTip');
+            if (oldTip) oldTip.remove();
+
+            selectedCards.forEach((cardName, index) => {
+                const card = cards[cardName];
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card-item';
+                cardDiv.style.animationDelay = `${index * 0.1}s`;
+                cardDiv.onclick = function() { selectCard(cardName, this); };
+                cardDiv.innerHTML = `<div class="card-name">${cardName}</div><div class="card-type">${card.type}</div>`;
+                cardsGrid.appendChild(cardDiv);
+
+                const effectDiv = document.createElement('div');
+                effectDiv.className = 'effect-item';
+                effectDiv.style.animationDelay = `${index * 0.1}s`;
+                effectDiv.innerHTML = `<span class="effect-name">【${cardName}】</span><span class="effect-desc">${card.effect}</span>`;
+                effectsList.appendChild(effectDiv);
+            });
+
+            const tipDiv = document.createElement('div');
+            tipDiv.id = 'selectTip';
+            tipDiv.style.cssText = `text-align: center; color: #667eea; margin-top: 15px; font-size: 1.1em; animation: fadeIn 0.5s;`;
+            tipDiv.innerHTML = '💡 点击上方卡片选择要转换的牌名';
+            cardsGrid.parentNode.insertBefore(tipDiv, cardsGrid.nextSibling);
+
+            resultContainer.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

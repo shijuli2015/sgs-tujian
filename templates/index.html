@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>武将图鉴 · 三国杀 DIY 武将技能查询</title>
+<meta name="description" content="三国杀 DIY 武将技能查询：按势力、体力、技能类型筛选，支持中文、拼音与首字母搜索。">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/common.js"></script>
+<script src="assets/app.js" defer></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="./"><span class="logo-mark">杀</span>DIY 武将图鉴<small>身份局</small></a>
+    <nav class="nav" aria-label="主导航"><a href="./" aria-current="page">武将</a><a href="tools/">模拟器</a></nav>
+    <form class="search" id="search-form" role="search">
+      <label class="sr-only" for="q">搜索武将</label>
+      <span class="icon" aria-hidden="true">⌕</span>
+      <input id="q" type="search" autocomplete="off" placeholder="名称、拼音、首字母、称号或技能…" enterkeyhint="search">
+      <kbd>Ctrl K</kbd>
+    </form>
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="切换明暗主题">☀</button>
+  </div>
+</header>
+
+<main>
+  <div class="page-head">
+    <div>
+      <h1>武将图鉴</h1>
+      <p>中文、拼音、首字母模糊搜索；技能描述里的关键词也能搜到。</p>
+    </div>
+  </div>
+
+  <section class="filters" aria-label="筛选">
+    <div class="frow"><span class="flabel">势力</span><span id="f-k" class="frow"></span></div>
+    <div class="frow"><span class="flabel">体力</span><span id="f-hp" class="frow"></span></div>
+    <div class="frow"><span class="flabel">技能</span><span id="f-tag" class="frow"></span></div>
+    <div class="frow"><span class="flabel">类型</span><span id="f-kind" class="frow"></span></div>
+  </section>
+
+  <div class="toolbar">
+    <span class="count" id="count" aria-live="polite">加载中…</span>
+    <button class="linkbtn" id="reset" type="button" hidden>清除筛选</button>
+    <label class="sr-only" for="sort">排序</label>
+    <select class="select" id="sort">
+      <option value="code">按编号</option>
+      <option value="name">按拼音</option>
+      <option value="hpDesc">体力 高→低</option>
+      <option value="hpAsc">体力 低→高</option>
+      <option value="skills">技能数</option>
+    </select>
+    <div class="seg" role="group" aria-label="卡面显示">
+      <button type="button" data-view="card" aria-pressed="true">完整卡面</button>
+      <button type="button" data-view="portrait" aria-pressed="false">聚焦立绘</button>
+    </div>
+    <div class="seg" role="group" aria-label="每行数量">
+      <button type="button" data-cols="3" aria-pressed="false">3</button>
+      <button type="button" data-cols="4" aria-pressed="false">4</button>
+      <button type="button" data-cols="5" aria-pressed="true">5</button>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden>
+    <p>没有符合条件的武将。</p>
+    <button class="linkbtn" id="empty-reset" type="button">清除搜索和筛选</button>
+  </div>
+
+  <noscript><ul>{{NOSCRIPT_LINKS}}</ul></noscript>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">
+    <span>非官方爱好者项目，代码以 MIT 协议开源。卡面图片与“三国杀”相关名称版权归游卡桌游及原画师所有。</span>
+    <span>快捷键：<kbd>Ctrl K</kbd> 或 <kbd>/</kbd> 搜索，回车打开第一个结果。</span>
+  </div>
+</footer>
+</body>
+</html>

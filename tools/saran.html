@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>飒然 · 装备牌随机生成器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#efe6d2; --paper:#f8f1e1; --ink:#221a14; --muted:#7a6a55;
+  --red:#a8281e; --gold:#b08a3e; --line:#d4c4a2; --chip:#fbf6ea;
+  --weapon:#a8281e; --armor:#3d5a72; --atk:#8a4b16; --def:#3e6b45; --treasure:#6b4a8a;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#16120e; --paper:#221c16; --ink:#efe4cf; --muted:#a8977c;
+    --red:#e0564a; --gold:#d6b064; --line:#3e3428; --chip:#2a231b;
+    --weapon:#e0564a; --armor:#7ea6c6; --atk:#d9954e; --def:#86b98e; --treasure:#b595d6;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16120e; --paper:#221c16; --ink:#efe4cf; --muted:#a8977c;
+  --red:#e0564a; --gold:#d6b064; --line:#3e3428; --chip:#2a231b;
+  --weapon:#e0564a; --armor:#7ea6c6; --atk:#d9954e; --def:#86b98e; --treasure:#b595d6;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Noto Serif SC","Songti SC","SimSun",serif;line-height:1.6}
+main{max-width:720px;margin:0 auto;padding:28px 18px 48px}
+h1{font-family:"ZCOOL XiaoWei","Noto Serif SC",serif;font-weight:400;
+  font-size:clamp(2.2rem,8vw,3.4rem);margin:0;letter-spacing:.12em;color:var(--red);line-height:1.1}
+.sub{color:var(--muted);margin:6px 0 22px;font-size:.95rem}
+.skill{border-left:3px solid var(--red);padding:10px 14px;background:var(--paper);
+  font-size:.92rem;margin-bottom:26px;border-radius:0 6px 6px 0}
+.skill b{color:var(--red)}
+.section-title{font-weight:600;margin:0 0 10px;font-size:1rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip span{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1.5px solid var(--line);
+  border-radius:999px;background:var(--chip);cursor:pointer;user-select:none;font-size:.95rem;transition:.15s}
+.chip span i{width:10px;height:10px;border-radius:50%;background:var(--c);opacity:.35}
+.chip input:checked + span{border-color:var(--c);color:var(--c);font-weight:600}
+.chip input:checked + span i{opacity:1}
+.chip input:focus-visible + span{outline:2px solid var(--gold);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:20px}
+.link{background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit;font-size:.88rem;padding:0}
+select{font:inherit;font-size:.9rem;padding:6px 8px;background:var(--chip);color:var(--ink);border:1.5px solid var(--line);border-radius:6px}
+.draw{display:block;width:100%;padding:14px;font:inherit;font-size:1.25rem;font-weight:900;letter-spacing:.3em;
+  background:var(--red);color:#fff8ec;border:none;border-radius:8px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.draw:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.draw:disabled{opacity:.4;cursor:not-allowed}
+.stage{display:flex;justify-content:center;margin:28px 0 8px;min-height:250px}
+.card{width:180px;height:250px;border-radius:12px;background:var(--paper);border:2px solid var(--c,var(--line));
+  box-shadow:0 8px 24px rgba(0,0,0,.18);position:relative;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:14px;text-align:center}
+.card.empty{border-style:dashed;color:var(--muted);box-shadow:none}
+.card .type{position:absolute;top:10px;left:12px;font-size:.8rem;color:var(--c);font-weight:600}
+.card .range{position:absolute;top:10px;right:12px;font-size:.8rem;color:var(--muted)}
+.card .name{font-family:"ZCOOL XiaoWei","Noto Serif SC",serif;font-size:1.9rem;color:var(--c);
+  writing-mode:vertical-rl;letter-spacing:.15em;line-height:1.1;max-height:170px}
+.card .seal{position:absolute;bottom:10px;right:10px;width:34px;height:34px;border:2px solid var(--red);color:var(--red);
+  border-radius:4px;font-size:.72rem;line-height:1.05;display:flex;align-items:center;justify-content:center;transform:rotate(-8deg);font-weight:900}
+.flip{animation:flip .45s ease}
+@keyframes flip{from{transform:rotateY(90deg) scale(.9);opacity:.2}to{transform:none;opacity:1}}
+.hint{text-align:center;color:var(--muted);font-size:.85rem;margin:0 0 26px}
+.pool{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:.9rem;margin-bottom:22px}
+.pool div{margin:3px 0}
+.pool b{color:var(--c)}
+.hist ol{margin:0;padding-left:1.6em;font-size:.92rem}
+.hist li{margin:2px 0}
+.hist li em{font-style:normal;color:var(--muted);font-size:.82rem}
+</style>
+</head>
+<body>
+<main>
+  <h1>飒然</h1>
+  <p class="sub">威孙尚香 · 装备牌随机生成器（4v4 牌库）</p>
+
+  <div class="skill">你出牌阶段使用【杀】的次数+X（X为你装备区内牌的数量）。当你造成或受到1点伤害后，你<b>恢复一个装备栏</b>并将牌堆顶的一张牌视为<b>闲置装备栏对应副类别的随机一张装备牌</b>置于其中。</div>
+
+  <p class="section-title">闲置装备栏（可多选）</p>
+  <div class="chips" id="chips"></div>
+  <div class="row">
+    <button class="link" id="all">全选</button>
+    <button class="link" id="none">清空</button>
+    <label style="margin-left:auto;font-size:.88rem;color:var(--muted)">随机方式
+      <select id="mode">
+        <option value="type">先随机副类别，再随机装备</option>
+        <option value="card">所选范围内每张装备等概率</option>
+      </select>
+    </label>
+  </div>
+
+  <button class="draw" id="draw">飒 然</button>
+
+  <div class="stage"><div class="card empty" id="card">选择副类别后点击上方按钮</div></div>
+  <p class="hint" id="hint">&nbsp;</p>
+
+  <p class="section-title">牌库装备一览</p>
+  <div class="pool" id="pool"></div>
+
+  <div class="hist">
+    <p class="section-title">记录 <button class="link" id="clear" style="margin-left:8px">清除</button></p>
+    <ol id="hist" reversed></ol>
+  </div>
+</main>
+<script>
+const TYPES = [
+  {id:"weapon",   name:"武器",   c:"--weapon"},
+  {id:"armor",    name:"防具",   c:"--armor"},
+  {id:"atk",      name:"进攻马", c:"--atk"},
+  {id:"def",      name:"防御马", c:"--def"},
+  {id:"treasure", name:"宝物",   c:"--treasure"},
+];
+// 仅取自给定的 4v4 牌库
+const CARDS = {
+  weapon: [
+    ["诸葛连弩",1],["古锭刀",2],["雌雄双股剑",2],["倚天剑",2],["青釭剑",2],
+    ["青龙偃月刀",3],["丈八蛇矛",3],["贯石斧",3],["三尖两刃刀",3],
+    ["方天画戟",4],["五行鹤翎扇",4],["姬神弓",5]
+  ],
+  armor:    [["八卦阵"],["仁王盾"],["藤甲"],["白银狮子"],["黑光铠"],["护心镜"]],
+  atk:      [["赤兔"],["紫骍"],["大宛"]],
+  def:      [["绝影"],["的卢"],["爪黄飞电"],["骅骝"]],
+  treasure: [["木牛流马"]],
+};
+const $ = s => document.querySelector(s);
+const typeOf = id => TYPES.find(t => t.id === id);
+const rnd = n => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; };
+
+const chips = $("#chips");
+TYPES.forEach(t => {
+  chips.insertAdjacentHTML("beforeend",
+    `<label class="chip" style="--c:var(${t.c})"><input type="checkbox" value="${t.id}"><span><i></i>${t.name}</span></label>`);
+});
+$("#pool").innerHTML = TYPES.map(t =>
+  `<div style="--c:var(${t.c})"><b>${t.name}</b>（${CARDS[t.id].length}）：${CARDS[t.id].map(c=>c[0]).join("、")}</div>`).join("");
+
+const boxes = () => [...chips.querySelectorAll("input")];
+const selected = () => boxes().filter(b => b.checked).map(b => b.value);
+const sync = () => { $("#draw").disabled = selected().length === 0; };
+chips.addEventListener("change", sync);
+$("#all").onclick = () => { boxes().forEach(b => b.checked = true); sync(); };
+$("#none").onclick = () => { boxes().forEach(b => b.checked = false); sync(); };
+sync();
+
+let count = 0;
+$("#draw").onclick = () => {
+  const sel = selected(); if (!sel.length) return;
+  let tid, card;
+  if ($("#mode").value === "type") {
+    tid = sel[rnd(sel.length)];
+    card = CARDS[tid][rnd(CARDS[tid].length)];
+  } else {
+    const all = sel.flatMap(id => CARDS[id].map(c => [id, c]));
+    [tid, card] = all[rnd(all.length)];
+  }
+  const t = typeOf(tid);
+  const el = $("#card");
+  el.className = "card";
+  el.style.setProperty("--c", `var(${t.c})`);
+  el.innerHTML = `<span class="type">${t.name}</span>` +
+    (card[1] ? `<span class="range">攻击范围 ${card[1]}</span>` : "") +
+    `<span class="name">${card[0]}</span><span class="seal">飒<br>然</span>`;
+  void el.offsetWidth; el.classList.add("flip");
+  $("#hint").textContent = `恢复【${t.name}】栏，置入【${card[0]}】` + (sel.length > 1 ? `（候选：${sel.map(s=>typeOf(s).name).join("/")}）` : "");
+  count++;
+  $("#hist").insertAdjacentHTML("afterbegin",
+    `<li value="${count}"><span style="color:var(${t.c})">${card[0]}</span> <em>${t.name}</em></li>`);
+};
+$("#clear").onclick = () => { $("#hist").innerHTML = ""; count = 0; };
+</script>
+</body>
+</html>
