@@ -1,5 +1,7 @@
 # 三国杀 DIY 武将图鉴
 
+在线访问：**https://shijuli2015.github.io/sgs-tujian/**
+
 一个开源、纯静态的三国杀 DIY 武将技能查询网站。把 [sgsshap](http://www.sgsshap.cn) 导出的武将卡（`.json` + 同名 `.png`）放进一个文件夹，运行一条命令就能生成完整网站，可以直接部署到 GitHub Pages、Vercel 或任何静态托管。
 
 版式参考了 [sanguosha-tujian](https://sanguosha-tujian.vercel.app/generals)。
