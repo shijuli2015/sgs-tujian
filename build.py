@@ -13,6 +13,7 @@ Output: a dependency-free static site (any static host / GitHub Pages / Vercel):
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
 import json
 import re
@@ -311,7 +312,7 @@ BACKBAR = (
     '<style>@media (max-width:1000px){body{padding-top:52px !important}}</style>')
 
 
-def publish_tools(tools: list[dict], idx: dict, out: Path) -> None:
+def publish_tools(tools: list[dict], idx: dict, out: Path, build_id: str) -> None:
     tdir = out / "tools"
     if tdir.exists():
         shutil.rmtree(tdir)
@@ -336,7 +337,8 @@ def publish_tools(tools: list[dict], idx: dict, out: Path) -> None:
             f'<h2>{esc(t["name"])}<small>{esc(t["title"])}</small></h2>'
             f'<p>{esc(t["desc"])}</p><span class="tool-go">打开模拟器 →</span></a>'
             f'{"<div class=tool-meta>" + skill + owners + "</div>" if skill or owners else ""}</article>')
-    page = (TEMPLATES / "tools.html").read_text(encoding="utf-8").replace("{{TOOLS}}", "".join(items))
+    page = ((TEMPLATES / "tools.html").read_text(encoding="utf-8")
+            .replace("{{TOOLS}}", "".join(items)).replace("{{BUILD}}", build_id))
     (tdir / "index.html").write_text(page, encoding="utf-8")
 
 
@@ -468,8 +470,11 @@ def build(srcs: list[Path], out: Path, force: bool) -> None:
     (out / "data").mkdir(exist_ok=True)
     data = {"generated": __import__("datetime").date.today().isoformat(),
             "cards": [list_record(c) for c in cards]}
-    (out / "data" / "generals.json").write_text(
-        json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    blob = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    (out / "data" / "generals.json").write_text(blob, encoding="utf-8")
+    # GitHub Pages caches for 10 minutes; stamping the asset/data URLs means a new
+    # build is picked up at once instead of serving yesterday's cards
+    build_id = hashlib.sha1(blob.encode("utf-8")).hexdigest()[:10]
 
     # detail pages (stale ones removed so renamed slugs don't linger)
     gdir = out / "generals"
@@ -481,15 +486,17 @@ def build(srcs: list[Path], out: Path, force: bool) -> None:
     for c in cards:
         d = gdir / c["slug"]
         d.mkdir(parents=True, exist_ok=True)
-        (d / "index.html").write_text(render_detail(c, idx, order, tpl), encoding="utf-8")
+        (d / "index.html").write_text(
+            render_detail(c, idx, order, tpl).replace("{{BUILD}}", build_id), encoding="utf-8")
 
-    publish_tools(tools, idx, out)
+    publish_tools(tools, idx, out, build_id)
     print(f"  {len(tools)} simulators")
 
     # list page, with a crawlable <noscript> index
     links = "".join(f'<li><a href="generals/{c["slug"]}/">{esc(c["display"])}'
                     f'{"「" + esc(c["title"]) + "」" if c["title"] else ""}</a></li>' for c in cards)
-    index = (TEMPLATES / "index.html").read_text(encoding="utf-8").replace("{{NOSCRIPT_LINKS}}", links)
+    index = ((TEMPLATES / "index.html").read_text(encoding="utf-8")
+             .replace("{{NOSCRIPT_LINKS}}", links).replace("{{BUILD}}", build_id))
     (out / "index.html").write_text(index, encoding="utf-8")
     (out / "404.html").write_text(
         (TEMPLATES / "404.html").read_text(encoding="utf-8"), encoding="utf-8")

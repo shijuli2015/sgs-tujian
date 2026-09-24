@@ -272,7 +272,7 @@
       fk: $("#f-k"), fhp: $("#f-hp"), ftag: $("#f-tag"), fkind: $("#f-kind")
     };
     readURL();
-    fetch("data/generals.json")
+    fetch("data/generals.json?v=" + (document.body.dataset.build || ""))
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(init)
       .catch(function (err) {
