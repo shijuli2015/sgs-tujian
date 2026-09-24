@@ -82,6 +82,15 @@
     }).join("");
   }
 
+  function picHTML(c, cls) {
+    if (!c) return '<div class="seat-pic ' + cls + ' empty" aria-hidden="true">?</div>';
+    var img = c.img
+      ? '<img src="../img/thumb/' + encodeURIComponent(c.slug) + '.webp" alt="' + esc(c.name) + '" decoding="async">'
+      : '<span class="muted">无卡面</span>';
+    return '<a class="seat-pic ' + cls + '" href="../generals/' + encodeURIComponent(c.slug) +
+      '/" title="' + esc(c.name + (c.title ? "「" + c.title + "」" : "")) + '">' + img + "</a>";
+  }
+
   function seatHTML(s, i) {
     var c = findCard(s.g), c2 = findCard(s.g2);
     var hp = s.hp == null ? (c ? c.maxHp : "") : s.hp;
@@ -93,6 +102,8 @@
         '<label class="seat-dead"><input type="checkbox" class="dead-box"' + (s.dead ? " checked" : "") + "> 阵亡</label>" +
       "</header>" +
       '<div class="seat-body">' +
+        '<div class="seat-pics">' + picHTML(c, "main") + (c2 || s.g2 ? picHTML(c2, "sub") : "") + "</div>" +
+        '<div class="seat-fields">' +
         '<div class="seat-gen">' +
           '<input class="gen-input" list="gen-list" placeholder="武将" value="' + esc(s.g) + '" aria-label="武将">' +
           '<input class="gen-input gen-2" list="gen-list" placeholder="副将（可空）" value="' + esc(s.g2) + '" aria-label="副将">' +
@@ -109,7 +120,7 @@
           '<button class="hp-btn" data-d="1" type="button" aria-label="体力 +1">+</button>' +
           '<input class="note" placeholder="备注（装备、判定、心证…）" maxlength="' + MAX_NOTE + '" value="' + esc(s.note) + '">' +
         "</div>" +
-      "</div></article>";
+      "</div></div></article>";
   }
 
   function kingdomName(k) {
@@ -208,6 +219,7 @@
     var next = tmp.firstChild;
     el.className = next.className;
     el.querySelector(".seat-meta").innerHTML = next.querySelector(".seat-meta").innerHTML;
+    el.querySelector(".seat-pics").innerHTML = next.querySelector(".seat-pics").innerHTML;
     el.querySelector(".hp-val").textContent = next.querySelector(".hp-val").textContent;
   }
 
