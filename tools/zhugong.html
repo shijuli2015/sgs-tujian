@@ -71,8 +71,8 @@ var cards = [], byName = {};
 
 function rnd(n) { var a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; }
 
-// The randomiser's names don't always match the card names on this site
-// (界孙休 here vs 谋孙休 in the 图鉴), so fall back to the name without its prefix.
+// Names above match the 图鉴 exactly; the prefix-stripped fallback only covers a
+// card later being renamed (界张角 -> 谋张角 and the like).
 function lookup(name) {
   if (byName[name]) return byName[name];
   var base = name.replace(PREFIX, "");
