@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>牌局记录 · 三国杀 DIY 武将图鉴</title>
+<meta name="description" content="身份局牌局记录：记录每个座位的身份、武将、体力与备注，自动保存并可生成分享链接。">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/style.css?v=913c14eef1">
+<script src="../assets/common.js?v=913c14eef1"></script>
+<script src="../assets/session.js?v=913c14eef1" defer></script>
+</head>
+<body data-build="913c14eef1">
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="../"><span class="logo-mark">杀</span>DIY 武将图鉴<small>身份局</small></a>
+    <nav class="nav" aria-label="主导航"><a href="../">武将</a><a href="../tools/">模拟器</a><a href="./" aria-current="page">牌局</a></nav>
+    <form class="search" action="../" method="get" role="search">
+      <label class="sr-only" for="q">搜索武将</label>
+      <span class="icon" aria-hidden="true">⌕</span>
+      <input id="q" name="q" type="search" autocomplete="off" placeholder="名称、拼音、首字母、称号或技能…" enterkeyhint="search">
+      <kbd>Ctrl K</kbd>
+    </form>
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="切换明暗主题">☀</button>
+  </div>
+</header>
+
+<main>
+  <div class="page-head">
+    <div>
+      <h1>牌局记录</h1>
+      <p>记录每个座位的身份、武将与体力。改动自动保存在本机浏览器，可生成链接分享给同桌。</p>
+    </div>
+  </div>
+
+  <section class="filters" aria-label="牌局设置">
+    <div class="frow">
+      <span class="flabel">人数</span>
+      <span id="seat-count" class="frow"></span>
+      <span class="saved muted" id="saved" aria-live="polite"></span>
+    </div>
+    <div class="frow">
+      <span class="flabel">操作</span>
+      <button class="chip" id="share" type="button">复制分享链接</button>
+      <button class="chip" id="copy-text" type="button">复制文字战报</button>
+      <button class="chip" id="reset-hp" type="button">体力回满</button>
+      <button class="chip" id="clear" type="button">清空牌局</button>
+    </div>
+  </section>
+
+  <p class="tally" id="tally"></p>
+  <div class="seats" id="seats"></div>
+
+  <p class="muted" style="margin-top:22px;font-size:13px">
+    提示：点武将名可搜索本站 350 张卡；选中武将后体力自动填入，可用 ± 调整。
+    分享链接把整局内容编码在网址里，对方打开即可看到；对方的改动不会同步回你这里。
+  </p>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">
+    <span>非官方爱好者项目，代码以 MIT 协议开源。卡面图片与“三国杀”相关名称版权归游卡桌游及原画师所有。</span>
+  </div>
+</footer>
+</body>
+</html>

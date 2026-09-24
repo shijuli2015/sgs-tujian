@@ -489,6 +489,12 @@ def build(srcs: list[Path], out: Path, force: bool) -> None:
         (d / "index.html").write_text(
             render_detail(c, idx, order, tpl).replace("{{BUILD}}", build_id), encoding="utf-8")
 
+    sdir = out / "session"
+    sdir.mkdir(parents=True, exist_ok=True)
+    (sdir / "index.html").write_text(
+        (TEMPLATES / "session.html").read_text(encoding="utf-8").replace("{{BUILD}}", build_id),
+        encoding="utf-8")
+
     publish_tools(tools, idx, out, build_id)
     print(f"  {len(tools)} simulators")
 
