@@ -152,7 +152,8 @@ def load_cards(src: Path) -> list[dict]:
         tags = []
         for s in skills:
             tags += [t for t in s["tags"] if t not in tags]
-        lord = bool(b.get("masterFlag")) or "主公技" in tags
+        ov = overrides.get(jf.stem, {})
+        lord = bool(b.get("masterFlag")) or "主公技" in tags or bool(ov.get("lord"))
 
         png = jf.with_suffix(".png")
         if not png.exists():
@@ -168,8 +169,7 @@ def load_cards(src: Path) -> list[dict]:
         tail_name = clean_name(tail)
         file_prefix = (tail_name[: -len(name)]
                        if not is_skillcard and name and tail_name.endswith(name) else "")
-        prefix = (overrides.get(jf.stem, {}).get("prefix") or (b.get("namePrefix") or "")
-                  or file_prefix).strip()
+        prefix = (ov.get("prefix") or (b.get("namePrefix") or "") or file_prefix).strip()
         if prefix and not is_skillcard and not display.startswith(prefix):
             display = prefix + name
         cards.append({
