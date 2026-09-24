@@ -427,10 +427,14 @@ def sort_key(c: dict):
     return (k, num, c["kind"] != "general", c["title"])
 
 
-def build(src: Path, out: Path, force: bool) -> None:
-    print(f"reading {src}")
-    cards = load_cards(src)
-    cards.sort(key=sort_key)
+def build(srcs: list[Path], out: Path, force: bool) -> None:
+    cards: dict[str, dict] = {}          # by source filename; a later --src wins
+    for src in srcs:
+        found = load_cards(src)
+        dupes = [c["file"] for c in found if c["file"] in cards]
+        print(f"reading {src}: {len(found)} cards" + (f", {len(dupes)} replacing earlier ones ({', '.join(dupes[:3])})" if dupes else ""))
+        cards.update({c["file"]: c for c in found})
+    cards = sorted(cards.values(), key=sort_key)
     assign_slugs(cards)
     link_cards(cards)
     tools = load_tools()
@@ -482,8 +486,9 @@ def build(src: Path, out: Path, force: bool) -> None:
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--src", type=Path, default=ROOT.parent / "characters")
+    ap.add_argument("--src", type=Path, nargs="+", default=[ROOT.parent / "characters", ROOT.parent / "character2"],
+                    help="card folders, later ones win on duplicate file names")
     ap.add_argument("--out", type=Path, default=ROOT / "site")
     ap.add_argument("--force", action="store_true", help="re-encode every image")
     a = ap.parse_args()
-    build(a.src.resolve(), a.out.resolve(), a.force)
+    build([s.resolve() for s in a.src if s.exists()], a.out.resolve(), a.force)

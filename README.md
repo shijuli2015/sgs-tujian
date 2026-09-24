@@ -14,7 +14,7 @@
 - **详情页**：每位武将一个预渲染的静态页面，内容包括卡面大图、势力、体力（含护甲）、编号、称号、画师，以及逐条技能。技能中的【牌名】、「标记」和加粗关键词会高亮显示。
 - **关联**：同一武将的不同版本互相链接；技能卡（技能池、衍生武将）会挂在所属武将下。
 - 筛选状态保存在网址里，可以直接分享；支持明暗主题；键盘操作：`Ctrl K` 或 `/` 搜索，回车打开第一个结果，详情页用 `←` `→` 翻页。
-- 无框架、无构建工具、无外部请求。整站约 55 MB，其中几乎都是图片。
+- 无框架、无构建工具、无外部请求。当前收录 349 张卡，整站约 86 MB，其中几乎都是图片。
 
 ## 使用
 
@@ -22,7 +22,8 @@
 
 ```bash
 pip install -r requirements.txt
-python build.py --src ../characters      # 生成到 ./site
+python build.py                          # 默认读取 ../characters 与 ../character2，生成到 ./site
+python build.py --src ../characters ../character2 --out site
 python -m http.server -d site 8000       # 本地预览 http://localhost:8000
 ```
 
@@ -40,7 +41,8 @@ python -m http.server -d site 8000       # 本地预览 http://localhost:8000
 - 文件名格式：`模板.编号.称号.名字`。
 - 名字末尾的数字（`袁绍2`）会被去掉，用于区分同一武将的多个版本。
 - 名字里带 `技能卡` 或 `技能池` 的，会作为技能卡归到同编号的武将下。
-- 如果图片名比 JSON 多一个前缀（`吴懿.json` + `谋吴懿.png`），也会自动配对，并把前缀显示在名字上。
+- 名字前的版本前缀（界、谋、威、神、魔、族……）从文件名自动识别：`鸿谋翼远.谋鲁肃.json` 而 JSON 里名字是「鲁肃」，网站显示「谋鲁肃」，同名的不同版本仍会归到一起。图片名比 JSON 多前缀（`吴懿.json` + `谋吴懿.png`）也会自动配对。
+- 可以传多个 `--src` 文件夹；文件名重复时，后面的文件夹覆盖前面的。
 
 ### 技能模拟器
 
@@ -72,7 +74,7 @@ site/               生成结果，直接部署这个文件夹
 - **GitHub Pages**：把 `site/` 一起提交，推送到 `main` 后，`.github/workflows/pages.yml` 会自动发布。需要先在仓库的 Settings → Pages 里把 Source 设为 GitHub Actions。
 - **Vercel / Netlify / Cloudflare Pages**：把输出目录（Output / Publish directory）设为 `site`，构建命令留空。
 
-原始 PNG 很大（每张约 2.4 MB），建议不要放进仓库，只提交生成后的 `site/`（WebP，约 55 MB）。
+原始 PNG 很大（每张约 2.4 MB），建议不要放进仓库，只提交生成后的 `site/`（WebP，约 86 MB）。
 
 ## 版权说明
 
