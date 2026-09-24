@@ -24,6 +24,14 @@
     "skills": ["武佑"]
   },
   {
+    "slug": "zhugong",
+    "file": "zhugong.html",
+    "name": "主公随机器",
+    "title": "四势力",
+    "desc": "魏蜀吴群各随机一名主公，同一势力不会连续抽到同一人，附卡图。",
+    "skills": []
+  },
+  {
     "slug": "jinnangpu",
     "file": "jinnangpu.html",
     "name": "锦囊谱",

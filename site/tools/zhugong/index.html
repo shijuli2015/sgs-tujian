@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>主公随机器 · 四势力</title>
+<style>
+:root{
+  --bg:#efe6d2; --paper:#f8f1e1; --ink:#221a14; --muted:#7a6a55;
+  --red:#a8281e; --gold:#b08a3e; --line:#d4c4a2; --chip:#fbf6ea;
+  --wei:#3a63a8; --shu:#b23a2c; --wu:#2f8455; --qun:#8a7038;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16120e; --paper:#221c16; --ink:#efe4cf; --muted:#a8977c;
+    --red:#e0564a; --gold:#d6b064; --line:#3e3428; --chip:#2a231b;
+    --wei:#7ea6e0; --shu:#e0776a; --wu:#7bc49a; --qun:#d6b064; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6;
+  font-family:"Noto Serif SC","Songti SC","PingFang SC","Microsoft YaHei",serif}
+main{max-width:880px;margin:0 auto;padding:26px 18px 48px}
+h1{font-size:clamp(2rem,7vw,3rem);margin:0;letter-spacing:.14em;color:var(--red);
+  font-family:"STKaiti","KaiTi",serif}
+.sub{color:var(--muted);margin:6px 0 20px;font-size:.95rem}
+.draw{display:block;width:100%;padding:14px;font:inherit;font-size:1.25rem;font-weight:900;letter-spacing:.3em;
+  background:var(--red);color:#fff8ec;border:none;border-radius:8px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.draw:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0 10px}
+@media (max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}}
+.k{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:10px;
+  padding:10px;display:grid;gap:8px;text-align:center}
+.k h2{margin:0;font-size:1rem;color:var(--c);letter-spacing:.2em;font-weight:700}
+.pic{display:block;aspect-ratio:1098/1542;border-radius:8px;overflow:hidden;background:var(--chip);
+  border:1px solid var(--line)}
+.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.pic.empty{display:grid;place-items:center;color:var(--muted);font-size:.85rem;border-style:dashed}
+.name{font-size:1.15rem;font-weight:700;font-family:"STKaiti","KaiTi",serif;letter-spacing:.08em;min-height:1.6em}
+.reroll{border:1px solid var(--line);background:var(--chip);color:var(--muted);border-radius:999px;
+  padding:2px 10px;font:inherit;font-size:.78rem;cursor:pointer;justify-self:center}
+.reroll:hover{border-color:var(--c);color:var(--c)}
+.pool{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;
+  font-size:.9rem;margin-top:20px}
+.pool div{margin:3px 0}
+.pool b{color:var(--c)}
+.pool .cur{color:var(--red);font-weight:700}
+.note{color:var(--muted);font-size:.82rem;margin-top:14px}
+</style>
+</head>
+<body><nav id="sgs-backbar" style="position:fixed;top:10px;left:10px;z-index:2147483000;display:flex;gap:2px;font:13px/1 'PingFang SC','Microsoft YaHei',sans-serif;background:rgba(18,16,21,.82);backdrop-filter:blur(6px);border:1px solid rgba(214,170,85,.45);border-radius:999px;padding:3px;box-shadow:0 4px 14px rgba(0,0,0,.25)"><a href="../../" style="color:#f0cf85;text-decoration:none;padding:6px 10px;border-radius:999px">← 图鉴</a><a href="../" style="color:#ece6da;text-decoration:none;padding:6px 10px;border-radius:999px">模拟器</a></nav><style>@media (max-width:1000px){body{padding-top:52px !important}}</style>
+<main>
+  <h1>主公随机器</h1>
+  <p class="sub">四势力各随机一名主公，同一势力不会连续抽到同一人</p>
+
+  <button class="draw" id="draw">随 机</button>
+
+  <div class="grid" id="grid"></div>
+  <div class="pool" id="pool"></div>
+  <p class="note" id="note">卡图取自本站图鉴，点击可查看该武将详情。</p>
+</main>
+<script>
+var KINGDOMS = [
+  { id: "wei", name: "魏", lords: ["威曹操", "威曹丕", "界曹叡", "曹芳"] },
+  { id: "shu", name: "蜀", lords: ["谋刘备", "威刘备", "界刘禅", "界刘谌"] },
+  { id: "wu",  name: "吴", lords: ["谋孙坚", "威孙策", "威孙权", "界孙休"] },
+  { id: "qun", name: "群", lords: ["谋张角", "威董卓", "谋袁绍", "界刘焉"] }
+];
+var PREFIX = /^[威谋界军族乐星魔势武起]/;
+
+var picked = { wei: null, shu: null, wu: null, qun: null };
+var cards = [], byName = {};
+
+function rnd(n) { var a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; }
+
+// The randomiser's names don't always match the card names on this site
+// (界孙休 here vs 谋孙休 in the 图鉴), so fall back to the name without its prefix.
+function lookup(name) {
+  if (byName[name]) return byName[name];
+  var base = name.replace(PREFIX, "");
+  var hit = null;
+  for (var i = 0; i < cards.length; i++) {
+    var c = cards[i];
+    if (c.name === base || c.name.replace(PREFIX, "") === base) {
+      if (c.lord) return c;
+      if (!hit) hit = c;
+    }
+  }
+  return hit;
+}
+
+function roll(k) {
+  var pool = k.lords.filter(function (n) { return n !== picked[k.id]; });
+  picked[k.id] = pool[rnd(pool.length)];
+}
+
+function render() {
+  document.getElementById("grid").innerHTML = KINGDOMS.map(function (k) {
+    var name = picked[k.id], c = name && lookup(name);
+    var pic = c && c.img
+      ? '<a class="pic" href="../../generals/' + encodeURIComponent(c.slug) + '/" title="' + c.name + '">' +
+        '<img src="../../img/thumb/' + encodeURIComponent(c.slug) + '.webp" alt="' + name + '"></a>'
+      : '<div class="pic empty">' + (name ? "无卡面" : "点上方按钮") + "</div>";
+    return '<section class="k" style="--c:var(--' + k.id + ')"><h2>' + k.name + "</h2>" + pic +
+      '<div class="name">' + (name || "—") + "</div>" +
+      '<button class="reroll" data-k="' + k.id + '" type="button">重抽</button></section>';
+  }).join("");
+
+  document.getElementById("pool").innerHTML = KINGDOMS.map(function (k) {
+    return '<div style="--c:var(--' + k.id + ')"><b>' + k.name + "</b>　" + k.lords.map(function (n) {
+      return n === picked[k.id] ? '<span class="cur">' + n + "</span>" : n;
+    }).join("、") + "</div>";
+  }).join("");
+}
+
+document.getElementById("draw").onclick = function () {
+  KINGDOMS.forEach(roll);
+  render();
+};
+document.getElementById("grid").addEventListener("click", function (e) {
+  var b = e.target.closest(".reroll");
+  if (!b) return;
+  e.preventDefault();
+  roll(KINGDOMS.filter(function (k) { return k.id === b.dataset.k; })[0]);
+  render();
+});
+
+render();
+fetch("../../data/generals.json")
+  .then(function (r) { return r.json(); })
+  .then(function (d) {
+    cards = d.cards.filter(function (c) { return c.kind === "general"; });
+    cards.forEach(function (c) { if (!byName[c.name]) byName[c.name] = c; });
+    render();
+  })
+  .catch(function () {
+    document.getElementById("note").textContent = "卡图加载失败，名字仍可正常随机。";
+  });
+</script>
+</body>
+</html>
