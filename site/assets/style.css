@@ -299,6 +299,27 @@ blockquote { margin: 18px 0 0; padding: 10px 14px; border-left: 3px solid var(--
   background: var(--chip, var(--bg-2)); color: var(--text); text-align: center; }
 .gen-input:focus { outline: none; border-color: var(--gold); }
 
+/* ---------------------------------------------------------------- draft */
+.draft { display: grid; gap: 12px; grid-template-columns: repeat(var(--cols, 5), minmax(0, 1fr)); align-items: start; }
+@media (max-width: 1000px) { .draft { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 720px)  { .draft { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } }
+.draft.hidden .draft-pic img, .draft.hidden .draft-skills { filter: blur(14px); pointer-events: none; }
+
+.draft-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 9px; display: grid; gap: 8px; min-width: 0; }
+.draft-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-height: 24px; }
+.draft-name { font-size: 15px; }
+.draft-pic { display: block; aspect-ratio: 1098 / 1542; border-radius: 8px; overflow: hidden;
+  background: var(--bg-2); border: 1px solid var(--line); }
+.draft-pic img { width: 100%; height: 100%; object-fit: contain; background: var(--bg-2); }
+.draft-pic:hover { border-color: var(--gold); }
+.draft-pic.empty { display: grid; place-items: center; border-style: dashed; color: var(--muted);
+  font-size: 13px; text-align: center; padding: 8px; }
+.draft-skills { display: grid; gap: 6px; }
+.draft-skill { font-size: 12.5px; line-height: 1.6; color: var(--text-2); }
+.draft-skill b { color: var(--gold-2); margin-right: 5px;
+  font-family: "STKaiti", "KaiTi", "Noto Serif SC", serif; font-size: 14px; letter-spacing: .06em; }
+
 /* ---------------------------------------------------------------- footer */
 .site-footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 12.5px; }
 .site-footer .inner { max-width: var(--maxw); margin: 0 auto; padding: 18px 16px 28px; display: grid; gap: 4px; }

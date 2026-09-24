@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>选将预览 · 三国杀 DIY 武将图鉴</title>
+<meta name="description" content="选将预览：输入 4–5 名武将并排对比卡面与技能，只保存在自己的浏览器，互不可见。">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/style.css?v=913c14eef1">
+<script src="../assets/common.js?v=913c14eef1"></script>
+<script src="../assets/draft.js?v=913c14eef1" defer></script>
+</head>
+<body data-build="913c14eef1">
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="../"><span class="logo-mark">杀</span>DIY 武将图鉴<small>身份局</small></a>
+    <nav class="nav" aria-label="主导航">
+      <a href="../">武将</a><a href="../tools/">模拟器</a><a href="../session/">牌局</a><a href="./" aria-current="page">选将</a>
+    </nav>
+    <form class="search" action="../" method="get" role="search">
+      <label class="sr-only" for="q">搜索武将</label>
+      <span class="icon" aria-hidden="true">⌕</span>
+      <input id="q" name="q" type="search" autocomplete="off" placeholder="名称、拼音、首字母、称号或技能…" enterkeyhint="search">
+      <kbd>Ctrl K</kbd>
+    </form>
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="切换明暗主题">☀</button>
+  </div>
+</header>
+
+<main>
+  <div class="page-head">
+    <div>
+      <h1>选将预览</h1>
+      <p>把发到的武将输进去，并排看卡面和技能再决定选谁。</p>
+    </div>
+  </div>
+
+  <section class="filters" aria-label="设置">
+    <div class="frow">
+      <span class="flabel">张数</span>
+      <span id="slot-count" class="frow"></span>
+      <span class="saved muted" id="saved" aria-live="polite"></span>
+    </div>
+    <div class="frow">
+      <span class="flabel">操作</span>
+      <button class="chip" id="hide" type="button" aria-pressed="false">遮挡卡面</button>
+      <button class="chip" id="clear" type="button">清空</button>
+      <span class="muted" style="font-size:12.5px">只保存在你自己的浏览器，别人看不到，也不会生成分享链接。</span>
+    </div>
+  </section>
+
+  <div class="draft" id="slots"></div>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">
+    <span>非官方爱好者项目，代码以 MIT 协议开源。卡面图片与“三国杀”相关名称版权归游卡桌游及原画师所有。</span>
+  </div>
+</footer>
+</body>
+</html>
