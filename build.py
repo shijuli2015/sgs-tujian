@@ -247,6 +247,15 @@ def make_images(cards: list[dict], out: Path, force: bool) -> None:
         for f in (out / "img" / sub).glob("*.webp"):
             if f.stem not in live:
                 f.unlink()
+
+    # remember which file each image came from: switching a card to a same-named PNG in
+    # another source folder changes nothing about mtimes, but must still re-encode
+    mpath = out / "img" / "manifest.json"
+    try:
+        manifest = json.loads(mpath.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        manifest = {}
+    fresh: dict[str, list] = {}
     for i, c in enumerate(cards, 1):
         if not c["png"]:
             c["img"] = None
@@ -254,7 +263,10 @@ def make_images(cards: list[dict], out: Path, force: bool) -> None:
         c["img"] = True
         targets = [(out / "img" / "thumb" / f"{c['slug']}.webp", THUMB_W, 78),
                    (out / "img" / "card" / f"{c['slug']}.webp", CARD_W, 85)]
-        if not force and all(t.exists() and t.stat().st_mtime >= c["png"].stat().st_mtime for t, _, _ in targets):
+        st = c["png"].stat()
+        stamp = [str(c["png"]), int(st.st_mtime), st.st_size]
+        fresh[c["slug"]] = stamp
+        if not force and manifest.get(c["slug"]) == stamp and all(t.exists() for t, _, _ in targets):
             continue
         with Image.open(c["png"]) as im:
             im = im.convert("RGB")
@@ -262,6 +274,7 @@ def make_images(cards: list[dict], out: Path, force: bool) -> None:
                 h = round(im.height * w / im.width)
                 im.resize((w, h), Image.LANCZOS).save(path, "WEBP", quality=q, method=6)
         print(f"  img {i}/{len(cards)} {c['slug']}")
+    mpath.write_text(json.dumps(fresh, ensure_ascii=False, indent=0), encoding="utf-8")
 
 
 def load_tools() -> list[dict]:
