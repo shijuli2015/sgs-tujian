@@ -112,6 +112,10 @@ def load_cards(src: Path) -> list[dict]:
     overrides = load_overrides()
     cards = []
     for jf in sorted(src.glob("*.json")):
+        # an override key may be folder-qualified to target one copy of a duplicated card
+        if (overrides.get(f"{src.name}/{jf.stem}", {}).get("skip")
+                or overrides.get(jf.stem, {}).get("skip")):
+            continue
         try:
             d = json.loads(jf.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, UnicodeDecodeError) as e:
