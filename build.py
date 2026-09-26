@@ -159,8 +159,11 @@ def load_cards(src: Path) -> list[dict]:
         png = jf.with_suffix(".png")
         if not png.exists():
             # the image may carry a version prefix the JSON lacks: 恤下媲子.吴懿.json + 恤下媲子.谋吴懿.png
+            # match on the bare name so a prefix on either side still pairs up:
+            # 恤下媲子.吴懿.json + 恤下媲子.谋吴懿.png, and 君临即位.谋孙休.json + 君临即位.孙休.png
             head = jf.stem[: len(jf.stem) - len(tail)]
-            alts = [p for p in src.glob(f"{glob_escape(head)}*.png") if p.stem[len(head):].endswith(tail)]
+            alts = [p for p in src.glob(f"{glob_escape(head)}*.png")
+                    if name and clean_name(p.stem[len(head):]).endswith(name)]
             if len(alts) == 1:
                 png = alts[0]
                 prefix = png.stem[len(head):-len(tail)]
