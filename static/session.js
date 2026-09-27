@@ -182,11 +182,144 @@
     } else { fallback(); }
   }
 
+  // ---------------------------------------------------------------- voice
+  // Browser speech recognition returns characters, not pinyin, and mishears homophones
+  // (甄姬 -> 真机), so every match is done on pinyin built from the site's own table.
+  var py = {};          // char -> pinyin, from data/pinyin.json
+  var DIGITS = { 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9, 十: 10 };
+  var ID_WORDS = [["主公", "zhu"], ["忠臣", "zhong"], ["内奸", "nei"], ["内鬼", "nei"], ["反贼", "fan"], ["反包", "fan"]];
+
+  function toPinyin(s) {
+    var out = "";
+    for (var i = 0; i < s.length; i++) out += py[s[i]] || "";
+    return out;
+  }
+
+  function seatNumber(text) {
+    var m = text.match(/([0-9]+|[一二两三四五六七八九十]+)\s*号/);
+    if (!m) return 0;
+    var t = m[1];
+    if (/^[0-9]+$/.test(t)) return +t;
+    if (t === "十") return 10;
+    if (t.length === 2 && t[0] === "十") return 10 + (DIGITS[t[1]] || 0);
+    return DIGITS[t] || 0;
+  }
+
+  function matchGeneral(text, wantLord) {
+    var p = toPinyin(text);
+    if (p.length < 4) return null;                    // one syllable is too ambiguous
+    var best = null, bestScore = 0;
+    for (var i = 0; i < cards.length; i++) {
+      var c = cards[i], toks = (c.py || "").split(" "), score = 0;
+      for (var j = 0; j < toks.length; j++) {
+        var t = toks[j];
+        if (!t || t.length < 4) continue;
+        if (t === p) score = Math.max(score, 100);
+        else if (p.indexOf(t) > -1) score = Math.max(score, 80 + t.length);
+        else if (t.indexOf(p) > -1) score = Math.max(score, 60 + p.length);
+      }
+      if (!score) continue;
+      // 曹操 alone matches 威曹操 / 魔曹操 / 起曹操: prefer a lord when 主公 was said,
+      // otherwise the plainest name.
+      score = score * 100 + (wantLord && c.lord ? 30 : 0) - c.name.length;
+      if (score > bestScore) { bestScore = score; best = c; }
+    }
+    return best;
+  }
+
+  // "一号主公曹操 三号反贼张辽" -> one command per seat mention
+  function parse(text) {
+    var clean = text.replace(/[\s,，。、；;]/g, "");
+    var marks = [], re = /([0-9]+|[一二两三四五六七八九十]+)\s*号/g, m;
+    while ((m = re.exec(clean))) marks.push(m.index);
+    var parts = marks.length ? marks.map(function (at, i) {
+      return clean.slice(at, i + 1 < marks.length ? marks[i + 1] : clean.length);
+    }) : [clean];
+
+    return parts.map(function (part) {
+      var seat = seatNumber(part), rest = part.replace(/([0-9]+|[一二两三四五六七八九十]+)\s*号/, ""), id = "";
+      for (var i = 0; i < ID_WORDS.length; i++) {
+        if (rest.indexOf(ID_WORDS[i][0]) > -1) { id = ID_WORDS[i][1]; rest = rest.replace(ID_WORDS[i][0], ""); break; }
+      }
+      rest = rest.replace(/^(是|选|用|的)+/, "");
+      return { seat: seat, id: id, card: matchGeneral(rest, id === "zhu"), raw: part };
+    }).filter(function (c) { return c.seat || c.id || c.card; });
+  }
+
+  function applyVoice(cmd) {
+    var i = cmd.seat ? cmd.seat - 1 : -1;
+    if (i < 0) {                                       // no seat said: first empty one
+        for (var k = 0; k < state.seats.length; k++) if (!state.seats[k].g) { i = k; break; }
+    }
+    if (i < 0 || i >= state.n) return "座位 " + (cmd.seat || "?") + " 不在 1–" + state.n + " 内";
+    var s = state.seats[i];
+    if (cmd.id) s.id = cmd.id;
+    if (cmd.card) s.g = cmd.card.name;
+    var el = document.querySelector('.seat[data-i="' + i + '"]');
+    if (el) {
+      el.className = "seat" + (s.id ? " id-" + s.id : "");
+      redrawSeat(el, s);
+      el.querySelector(".gen-input").value = s.g;
+      el.querySelector(".seat-id").value = s.id;
+      el.classList.add("flash");
+      setTimeout(function () { el.classList.remove("flash"); }, 900);
+    }
+    scheduleSave();
+    return (i + 1) + "号" + (cmd.id ? " " + (IDENTITIES.filter(function (x) { return x.id === cmd.id; })[0] || {}).name : "") +
+      (cmd.card ? " " + cmd.card.name : "");
+  }
+
+  function setupVoice() {
+    var btn = $("#mic"), status = $("#mic-status");
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      btn.disabled = true;
+      status.textContent = "这个浏览器不支持语音识别，请用 Chrome 或 Edge。";
+      return;
+    }
+    var rec = new SR(), on = false;
+    rec.lang = "zh-CN";
+    rec.continuous = true;
+    rec.interimResults = true;
+
+    rec.onresult = function (e) {
+      var interim = "";
+      for (var i = e.resultIndex; i < e.results.length; i++) {
+        var text = e.results[i][0].transcript;
+        if (!e.results[i].isFinal) { interim += text; continue; }
+        var done = parse(text).map(applyVoice).filter(Boolean);
+        status.textContent = done.length ? "已填入：" + done.join("；") : "没听懂「" + text + "」";
+      }
+      if (interim) status.textContent = "听到：" + interim;
+    };
+    rec.onerror = function (e) {
+      status.textContent = e.error === "not-allowed" ? "麦克风被拒绝，请在地址栏允许后重试" : "识别出错：" + e.error;
+      stop();
+    };
+    rec.onend = function () { if (on) { try { rec.start(); } catch (err) { stop(); } } };
+
+    function stop() {
+      on = false; btn.setAttribute("aria-pressed", "false"); btn.textContent = "🎤 开始语音录入";
+      try { rec.stop(); } catch (e) { /* already stopped */ }
+    }
+    btn.addEventListener("click", function () {
+      if (on) { stop(); status.textContent = "已停止"; return; }
+      on = true; btn.setAttribute("aria-pressed", "true"); btn.textContent = "■ 停止录入";
+      status.textContent = "请说：三号 反贼 张辽";
+      try { rec.start(); } catch (e) { /* already running */ }
+    });
+  }
+
   // ---------------------------------------------------------------- boot
   document.addEventListener("DOMContentLoaded", function () {
     load();
     render();
     wire();
+    setupVoice();
+    fetch("../data/pinyin.json?v=" + (document.body.dataset.build || ""))
+      .then(function (r) { return r.json(); })
+      .then(function (t) { py = t; })
+      .catch(function () { /* voice matching falls back to nothing */ });
     fetch("../data/generals.json?v=" + (document.body.dataset.build || ""))
       .then(function (r) { return r.json(); })
       .then(function (d) {

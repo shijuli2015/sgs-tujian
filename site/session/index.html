@@ -40,6 +40,11 @@
       <span class="saved muted" id="saved" aria-live="polite"></span>
     </div>
     <div class="frow">
+      <span class="flabel">语音</span>
+      <button class="chip" id="mic" type="button" aria-pressed="false">🎤 开始语音录入</button>
+      <span class="muted" id="mic-status" aria-live="polite" style="font-size:12.5px">说「三号 反贼 张辽」即可填入</span>
+    </div>
+    <div class="frow">
       <span class="flabel">操作</span>
       <button class="chip" id="share" type="button">复制分享链接</button>
       <button class="chip" id="copy-text" type="button">复制文字战报</button>
@@ -51,6 +56,8 @@
 
   <p class="muted" style="margin-top:22px;font-size:13px">
     提示：武将框支持中文与拼音（输入 zgl 即可找到诸葛亮），点卡图进入详情页。
+    语音录入按同音匹配，说「三号 反贼 张辽」「一号主公曹操」都可以，一句里说多个座位也行；
+    识别由浏览器（Chrome / Edge）完成，录音会上传到浏览器厂商的语音服务。
     分享链接把整局编码在网址里，对方打开即可看到；对方的改动不会同步回你这里。
   </p>
 </main>

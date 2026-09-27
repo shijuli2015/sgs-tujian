@@ -479,6 +479,13 @@ def build(srcs: list[Path], out: Path, force: bool) -> None:
             "cards": [list_record(c) for c in cards]}
     blob = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
     (out / "data" / "generals.json").write_text(blob, encoding="utf-8")
+
+    # char -> pinyin for every character used in a general's name, so the voice input
+    # can match homophones ("真机" heard for 甄姬) without a pinyin library in the browser
+    chars = {ch for c in cards for ch in c["display"] + c["name"] + c["title"]}
+    table = {ch: py_full(ch)[0] for ch in sorted(chars) if py_full(ch)}
+    (out / "data" / "pinyin.json").write_text(
+        json.dumps(table, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     # GitHub Pages caches for 10 minutes; stamping the asset/data URLs means a new
     # build is picked up at once instead of serving yesterday's cards
     build_id = hashlib.sha1(blob.encode("utf-8")).hexdigest()[:10]
