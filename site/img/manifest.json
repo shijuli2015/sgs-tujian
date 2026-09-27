@@ -499,6 +499,11 @@
 1790228011,
 2255672
 ],
+"zhu-ge-liang-wmdj": [
+"C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.SHU004.威谋定疆.谋诸葛亮.png",
+1790531082,
+2592991
+],
 "zhu-ge-liang-zwlb": [
 "C:\\Users\\Shiju Li\\ai-code\\characters\\老UI.SHU004.忠武良弼.武诸葛亮.png",
 1758163460,
@@ -589,6 +594,16 @@
 1773423119,
 2690497
 ],
+"ma-su-xzjb": [
+"C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.SHU022.胸中甲兵.谋马谡.png",
+1790531310,
+2445643
+],
+"wang-ping-ybsz": [
+"C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.SHU023.佯败溯战.谋王平.png",
+1790531220,
+2496291
+],
 "wang-ping-zbzg": [
 "C:\\Users\\Shiju Li\\ai-code\\characters\\老UI.SHU023.镇北柱国.军王平.png",
 1757990065,
@@ -674,6 +689,11 @@
 1768459335,
 2428176
 ],
+"xia-hou-ba-gwkj": [
+"C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.SHU041.箍围抗尽.星夏侯霸.png",
+1790531438,
+2295083
+],
 "zhang-xing-cai-ljdz": [
 "C:\\Users\\Shiju Li\\ai-code\\characters\\老UI.SHU042.临军对阵.张星彩.png",
 1752732036,
@@ -698,6 +718,11 @@
 "C:\\Users\\Shiju Li\\ai-code\\characters\\老UI.SHU044.花海舞枪.马云騄技能卡.png",
 1750509687,
 2757141
+],
+"guan-suo-ttjx": [
+"C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.SHU045.倜傥孑侠.关索.png",
+1790501459,
+2524577
 ],
 "mi-zhu-xwjc": [
 "C:\\Users\\Shiju Li\\ai-code\\characters\\老UI.SHU046.喜挽金财.谋糜竺.png",
@@ -833,6 +858,11 @@
 "C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.SHU123.维情所止.柳婒.png",
 1790406743,
 2202661
+],
+"pang-feng-yi-txwj": [
+"C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.SHU124.瞳悉万机.庞凤衣.png",
+1790501662,
+2488264
 ],
 "huang-wu-die-yldy": [
 "C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.SHU127.月澜蝶影.黄舞蝶.png",
@@ -1289,11 +1319,6 @@
 1786213073,
 2347327
 ],
-"yan-liang-wen-chou-bjpd": [
-"C:\\Users\\Shiju Li\\ai-code\\characters\\老UI.QUN005.并肩破敌.谋颜良&文丑.png",
-1786301861,
-2736982
-],
 "dong-zhuo-tmlw": [
 "C:\\Users\\Shiju Li\\ai-code\\characters\\老UI.QUN006.天魔乱舞.威董卓.png",
 1757153795,
@@ -1333,6 +1358,11 @@
 "C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.QUN012.胡笳十八拍.乐蔡文姬.png",
 1790152302,
 2108940
+],
+"ma-teng-qqjhs": [
+"C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.QUN013.千骑卷黄沙.威马腾.png",
+1790531133,
+2230484
 ],
 "ma-teng-hdym": [
 "C:\\Users\\Shiju Li\\ai-code\\characters\\老UI.QUN013.横刀跃马.马腾.png",
@@ -1383,6 +1413,11 @@
 "C:\\Users\\Shiju Li\\ai-code\\characters\\老UI.QUN026.弯弓逐苍.军公孙瓒.png",
 1790445908,
 2393482
+],
+"gong-sun-zan-wylm": [
+"C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.QUN026.武勇戾猛.威公孙瓒.png",
+1790501017,
+2444789
 ],
 "chen-gong-yzej": [
 "C:\\Users\\Shiju Li\\ai-code\\characters\\老UI.QUN028.一战而就.谋陈宫.png",
@@ -1649,10 +1684,20 @@
 1790150018,
 2174745
 ],
+"mu-lu-da-wang-bndz": [
+"C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.QUN209.八纳洞主.木鹿大王.png",
+1790530848,
+2571336
+],
 "zhang-man-cheng-ycwl": [
 "C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.QUN210.蚁萃宛洛.张曼成.png",
 1790140143,
 2337789
+],
+"wang-yue-rtxj": [
+"C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.QUN219.锐通玄极.王越.png",
+1790531673,
+2244447
 ],
 "liu-fu-ren-ylwf": [
 "C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.QUN234.夜阑晚风.刘夫人.png",
@@ -1679,6 +1724,11 @@
 1790158247,
 2095934
 ],
+"shi-a-cfcr": [
+"C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.QUNXXX.传锋承刃.史阿.png",
+1790531528,
+2516484
+],
 "liu-hui-ztgl": [
 "C:\\Users\\Shiju Li\\ai-code\\characters\\老UI.QUNXXX.周天古率.刘徽.png",
 1773432982,
@@ -1688,6 +1738,11 @@
 "C:\\Users\\Shiju Li\\ai-code\\characters\\老UI.QUNXXX.忠虹贯日.伍孚.png",
 1790442723,
 2284073
+],
+"zhang-shi-ping-kzty": [
+"C:\\Users\\Shiju Li\\ai-code\\character2\\老UI.QUNXXX.慷赀桃园.张世平.png",
+1790531603,
+2313493
 ],
 "ji-ping-klrz": [
 "C:\\Users\\Shiju Li\\ai-code\\characters\\老UI.QUNXXX.疴龙如鸩.界吉平.png",
