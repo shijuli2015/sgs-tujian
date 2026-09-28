@@ -311,8 +311,34 @@ def load_signature_cards(idx_by_name: dict) -> list[dict]:
     return out
 
 
+SIG_W = 560
+
+
+def make_sig_images(cards: list[dict], out: Path) -> None:
+    d = out / "img" / "sig"
+    d.mkdir(parents=True, exist_ok=True)
+    live = set()
+    for c in cards:
+        name = c.get("img")
+        src = ROOT / "cardimg" / f"{name}.png" if name else None
+        if not name or not src.exists():
+            c["img"] = ""
+            continue
+        live.add(name)
+        dest = d / f"{name}.webp"
+        if dest.exists() and dest.stat().st_mtime >= src.stat().st_mtime:
+            continue
+        with Image.open(src) as im:
+            im = im.convert("RGB")
+            h = round(im.height * SIG_W / im.width)
+            im.resize((SIG_W, h), Image.LANCZOS).save(dest, "WEBP", quality=82, method=6)
+    for f in d.glob("*.webp"):
+        if f.stem not in live:
+            f.unlink()
+
+
 def render_cards_page(cards: list[dict], idx: dict) -> str:
-    groups = [("trick", "专属锦囊"), ("equip", "专属装备")]
+    groups = [("trick", "专属锦囊"), ("equip", "专属装备"), ("rule", "专属规则")]
     html_parts = []
     for kind, label in groups:
         items = [c for c in cards if c.get("kind") == kind]
@@ -326,8 +352,14 @@ def render_cards_page(cards: list[dict], idx: dict) -> str:
             text = (f'<p>{esc(c["text"])}</p>' if c.get("text")
                     else '<p class="muted">牌面效果尚未收录</p>')
             note = f'<p class="sig-note">{esc(c["note"])}</p>' if c.get("note") else ""
-            rows.append(f'<article class="sig"><h3>{esc(c["name"])}</h3>{text}{note}'
-                        f'{"<div class=sig-owners>" + owners + "</div>" if owners else ""}</article>')
+            pic = (f'<a class="sig-pic" href="../img/sig/{c["img"]}.webp" target="_blank" rel="noopener">'
+                   f'<img src="../img/sig/{c["img"]}.webp" alt="{esc(c["name"])}" loading="lazy" decoding="async"></a>'
+                   if c.get("img") else "")
+            meta = " · ".join(x for x in (c.get("suit"), c.get("slot")) if x)
+            head = (f'<h3>{esc(c["name"])}'
+                    f'{f"<small>{esc(meta)}</small>" if meta else ""}</h3>')
+            rows.append(f'<article class="sig">{pic}<div class="sig-body">{head}{text}{note}'
+                        f'{"<div class=sig-owners>" + owners + "</div>" if owners else ""}</div></article>')
         html_parts.append(f'<h2 class="sig-group">{label}</h2><div class="sigs">{"".join(rows)}</div>')
     return "".join(html_parts)
 
@@ -548,6 +580,7 @@ def build(srcs: list[Path], out: Path, force: bool) -> None:
     order = [c["slug"] for c in cards]
     by_display = {c["display"]: c for c in cards}
     sig_cards = load_signature_cards(by_display)
+    make_sig_images(sig_cards, out)
     for c in cards:
         c["sig"] = []
     for sc in sig_cards:

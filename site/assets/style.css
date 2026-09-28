@@ -318,10 +318,17 @@ table.deck thead th.k-red { color: var(--k-shu); }
 
 /* ---------------------------------------------------------------- 专属牌 */
 .sig-group { font-size: 16px; margin: 22px 0 10px; padding-left: 8px; border-left: 4px solid var(--gold); letter-spacing: .06em; }
-.sigs { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); }
-.sig { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 7px; }
+.sigs { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); }
+.sig { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px;
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; }
+.sig-body { display: grid; gap: 7px; min-width: 0; }
+.sig-pic { display: block; width: 104px; border-radius: 7px; overflow: hidden; border: 1px solid var(--line); background: var(--bg-2); }
+.sig-pic img { width: 100%; height: auto; display: block; }
+.sig-pic:hover { border-color: var(--gold); }
 .sig h3 { margin: 0; font-size: 19px; letter-spacing: .1em; color: var(--gold-2);
-  font-family: "STKaiti", "KaiTi", "Noto Serif SC", serif; }
+  font-family: "STKaiti", "KaiTi", "Noto Serif SC", serif; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.sig h3 small { font-family: inherit; font-size: 12.5px; letter-spacing: .02em; color: var(--muted); }
+@media (max-width: 420px) { .sig-pic { width: 76px; } }
 .sig p { margin: 0; line-height: 1.8; }
 .sig-note { color: var(--muted); font-size: 12.5px; line-height: 1.6; }
 .sig-owners { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 4px; border-top: 1px solid var(--line); }
