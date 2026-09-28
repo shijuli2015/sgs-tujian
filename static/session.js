@@ -305,7 +305,7 @@
     btn.addEventListener("click", function () {
       if (on) { stop(); status.textContent = "已停止"; return; }
       on = true; btn.setAttribute("aria-pressed", "true"); btn.textContent = "■ 停止录入";
-      status.textContent = "请说：三号 反贼 张辽";
+      status.textContent = "请说：三号 张辽（身份可以不说）";
       try { rec.start(); } catch (e) { /* already running */ }
     });
   }
