@@ -158,7 +158,8 @@ def load_cards(src: Path) -> list[dict]:
         for s in skills:
             tags += [t for t in s["tags"] if t not in tags]
         ov = overrides.get(jf.stem, {})
-        lord = bool(b.get("masterFlag")) or "主公技" in tags or bool(ov.get("lord"))
+        # a 技能卡 can print 主公技 (袁绍技能池, 界荀彧·匡祚) but is not itself a lord to pick
+        lord = not is_skillcard and (bool(b.get("masterFlag")) or "主公技" in tags or bool(ov.get("lord")))
 
         png = jf.with_suffix(".png")
         if not png.exists():
