@@ -296,6 +296,42 @@ def make_images(cards: list[dict], out: Path, force: bool) -> None:
     mpath.write_text(json.dumps(fresh, ensure_ascii=False, indent=0), encoding="utf-8")
 
 
+def load_signature_cards(idx_by_name: dict) -> list[dict]:
+    """武将专属牌 from cards.json, resolved to the generals that own them."""
+    p = ROOT / "cards.json"
+    if not p.exists():
+        return []
+    out = []
+    for c in json.loads(p.read_text(encoding="utf-8")).get("cards", []):
+        c["slugs"] = [idx_by_name[o]["slug"] for o in c.get("owners", []) if o in idx_by_name]
+        missing = [o for o in c.get("owners", []) if o not in idx_by_name]
+        if missing:
+            print(f"  ! cards.json: 专属牌「{c['name']}」找不到武将 {missing}", file=sys.stderr)
+        out.append(c)
+    return out
+
+
+def render_cards_page(cards: list[dict], idx: dict) -> str:
+    groups = [("trick", "专属锦囊"), ("equip", "专属装备")]
+    html_parts = []
+    for kind, label in groups:
+        items = [c for c in cards if c.get("kind") == kind]
+        if not items:
+            continue
+        rows = []
+        for c in items:
+            owners = "".join(
+                f'<a class="tool-owner" href="../generals/{s}/">{esc(idx[s]["display"])}'
+                f'<small>{esc(idx[s]["title"])}</small></a>' for s in c["slugs"])
+            text = (f'<p>{esc(c["text"])}</p>' if c.get("text")
+                    else '<p class="muted">牌面效果尚未收录</p>')
+            note = f'<p class="sig-note">{esc(c["note"])}</p>' if c.get("note") else ""
+            rows.append(f'<article class="sig"><h3>{esc(c["name"])}</h3>{text}{note}'
+                        f'{"<div class=sig-owners>" + owners + "</div>" if owners else ""}</article>')
+        html_parts.append(f'<h2 class="sig-group">{label}</h2><div class="sigs">{"".join(rows)}</div>')
+    return "".join(html_parts)
+
+
 def load_tools() -> list[dict]:
     p = TOOLS / "tools.json"
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else []
@@ -424,6 +460,10 @@ def render_detail(c: dict, idx: dict, order: list[str], tpl: str) -> str:
         rel.append(f'<h2>所属武将</h2><div class="rels">{related_links(c["parents"], idx, p)}</div>')
     if c["skillcards"]:
         rel.append(f'<h2>技能卡</h2><div class="rels">{related_links(c["skillcards"], idx, p)}</div>')
+    if c.get("sig"):
+        names = "、".join(esc(n) for n in c["sig"])
+        rel.append(f'<h2>专属牌</h2><p class="muted" style="margin:0">{names}'
+                   f'　<a href="{p}cards/" style="color:var(--gold)">查看规则 →</a></p>')
     if c["derived_of"]:
         rel.append(f'<h2>衍生自</h2><div class="rels">{related_links(c["derived_of"], idx, p)}</div>')
     if c["derived"]:
@@ -478,6 +518,13 @@ def build(srcs: list[Path], out: Path, force: bool) -> None:
     link_tools(cards, tools)
     idx = {c["slug"]: c for c in cards}
     order = [c["slug"] for c in cards]
+    by_display = {c["display"]: c for c in cards}
+    sig_cards = load_signature_cards(by_display)
+    for c in cards:
+        c["sig"] = []
+    for sc in sig_cards:
+        for slug in sc["slugs"]:
+            idx[slug]["sig"].append(sc["name"])
     print(f"  {len(cards)} cards "
           f"({sum(c['kind'] == 'general' for c in cards)} generals, "
           f"{sum(c['kind'] == 'skillcard' for c in cards)} skill cards)")
@@ -517,6 +564,13 @@ def build(srcs: list[Path], out: Path, force: bool) -> None:
         d.mkdir(parents=True, exist_ok=True)
         (d / "index.html").write_text(
             render_detail(c, idx, order, tpl).replace("{{BUILD}}", build_id), encoding="utf-8")
+
+    cdir = out / "cards"
+    cdir.mkdir(parents=True, exist_ok=True)
+    (cdir / "index.html").write_text(
+        (TEMPLATES / "cards.html").read_text(encoding="utf-8")
+        .replace("{{CARDS}}", render_cards_page(sig_cards, idx)).replace("{{BUILD}}", build_id),
+        encoding="utf-8")
 
     for page in ("session", "draft"):
         d = out / page

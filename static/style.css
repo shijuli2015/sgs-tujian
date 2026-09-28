@@ -305,6 +305,16 @@ blockquote { margin: 18px 0 0; padding: 10px 14px; border-left: 3px solid var(--
   background: var(--chip, var(--bg-2)); color: var(--text); text-align: center; }
 .gen-input:focus { outline: none; border-color: var(--gold); }
 
+/* ---------------------------------------------------------------- 专属牌 */
+.sig-group { font-size: 16px; margin: 22px 0 10px; padding-left: 8px; border-left: 4px solid var(--gold); letter-spacing: .06em; }
+.sigs { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); }
+.sig { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 7px; }
+.sig h3 { margin: 0; font-size: 19px; letter-spacing: .1em; color: var(--gold-2);
+  font-family: "STKaiti", "KaiTi", "Noto Serif SC", serif; }
+.sig p { margin: 0; line-height: 1.8; }
+.sig-note { color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+.sig-owners { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 4px; border-top: 1px solid var(--line); }
+
 /* ---------------------------------------------------------------- draft */
 .draft { display: grid; gap: 12px; grid-template-columns: repeat(var(--cols, 5), minmax(0, 1fr)); align-items: start; }
 @media (max-width: 1000px) { .draft { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
