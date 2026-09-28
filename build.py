@@ -225,11 +225,22 @@ def link_cards(cards: list[dict]) -> None:
         if c["kind"] == "general":
             by_code_name[(c["code"], c["name"])].append(c)
             by_name[c["name"]].append(c)
+    by_code: dict[str, list[dict]] = defaultdict(list)
+    for c in cards:
+        if c["kind"] == "general":
+            by_code[c["code"]].append(c)
     for c in cards:
         c["variants"], c["skillcards"], c["parents"] = [], [], []
+        c["derived"], c["derived_of"] = [], []
     for c in cards:
         if c["kind"] == "general":
             c["variants"] = [o["slug"] for o in by_code_name[(c["code"], c["name"])] if o is not c]
+            # QUN005A / QUN005B are 颜良 and 文丑 derived from QUN005 颜良&文丑
+            m = re.match(r"^([A-Za-z]+\d+)[A-Za-z]$", c["code"])
+            if m:
+                for o in by_code.get(m.group(1), []):
+                    c["derived_of"].append(o["slug"])
+                    o["derived"].append(c["slug"])
         else:
             same_code = [o for o in cards if o["kind"] == "general" and o["code"] == c["code"]]
             owners = [o for o in same_code if o["name"] == c["owner"]] or by_name.get(c["owner"], []) or same_code
@@ -413,6 +424,10 @@ def render_detail(c: dict, idx: dict, order: list[str], tpl: str) -> str:
         rel.append(f'<h2>所属武将</h2><div class="rels">{related_links(c["parents"], idx, p)}</div>')
     if c["skillcards"]:
         rel.append(f'<h2>技能卡</h2><div class="rels">{related_links(c["skillcards"], idx, p)}</div>')
+    if c["derived_of"]:
+        rel.append(f'<h2>衍生自</h2><div class="rels">{related_links(c["derived_of"], idx, p)}</div>')
+    if c["derived"]:
+        rel.append(f'<h2>衍生武将</h2><div class="rels">{related_links(c["derived"], idx, p)}</div>')
     if c["variants"]:
         rel.append(f'<h2>其他版本</h2><div class="rels">{related_links(c["variants"], idx, p)}</div>')
 
