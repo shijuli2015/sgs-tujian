@@ -332,6 +332,34 @@ def render_cards_page(cards: list[dict], idx: dict) -> str:
     return "".join(html_parts)
 
 
+def render_deck_page() -> tuple[str, str]:
+    """牌堆一览 from deck.json: one row per rank, one column per suit."""
+    p = ROOT / "deck.json"
+    if not p.exists():
+        return "", ""
+    d = json.loads(p.read_text(encoding="utf-8"))
+    suits, ranks, deck = d["suits"], d["ranks"], d["deck"]
+    head = "".join(f'<th class="k-{s["color"]}">{esc(s["name"])} {s["symbol"]}</th>' for s in suits)
+    rows = []
+    for rank in ranks:
+        cells = "".join(
+            f'<td class="deck-{s["color"]}">'
+            + "<br>".join(esc(c) for c in deck.get(s["name"], {}).get(rank, []))
+            + "</td>" for s in suits)
+        rows.append(f'<tr><th class="deck-rank">{esc(rank)}</th>{cells}</tr>')
+    if d.get("jokers"):
+        half = len(suits) // 2
+        rows.append('<tr><th class="deck-rank">JOKER</th>'
+                    + "".join(f'<td class="deck-black" colspan="{half}">{esc(j)}</td>' for j in d["jokers"])
+                    + "</tr>")
+    counts = [sum(len(v) for v in deck.get(s["name"], {}).values()) for s in suits]
+    summary = (" + ".join(map(str, counts)) + f' + {len(d.get("jokers", []))} = '
+               f'{sum(counts) + len(d.get("jokers", []))} 张 · 依据《{esc(d.get("source", ""))}》')
+    table = (f'<div class="deck-wrap"><table class="deck"><thead><tr><th class="deck-rank">点数</th>{head}</tr>'
+             f'</thead><tbody>{"".join(rows)}</tbody></table></div>')
+    return table, summary
+
+
 def load_tools() -> list[dict]:
     p = TOOLS / "tools.json"
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else []
@@ -564,6 +592,15 @@ def build(srcs: list[Path], out: Path, force: bool) -> None:
         d.mkdir(parents=True, exist_ok=True)
         (d / "index.html").write_text(
             render_detail(c, idx, order, tpl).replace("{{BUILD}}", build_id), encoding="utf-8")
+
+    deck_html, deck_summary = render_deck_page()
+    if deck_html:
+        ddir = out / "deck"
+        ddir.mkdir(parents=True, exist_ok=True)
+        (ddir / "index.html").write_text(
+            (TEMPLATES / "deck.html").read_text(encoding="utf-8")
+            .replace("{{DECK}}", deck_html).replace("{{SUMMARY}}", deck_summary)
+            .replace("{{BUILD}}", build_id), encoding="utf-8")
 
     cdir = out / "cards"
     cdir.mkdir(parents=True, exist_ok=True)
