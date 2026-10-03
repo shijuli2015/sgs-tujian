@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>任贤 · 季汉辅臣随机</title>
+<style>
+:root{
+  --bg:#efe6d2; --paper:#f8f1e1; --ink:#221a14; --muted:#7a6a55;
+  --red:#a8281e; --gold:#b08a3e; --line:#d4c4a2; --chip:#fbf6ea; --shu:#b23a2c;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16120e; --paper:#221c16; --ink:#efe4cf; --muted:#a8977c;
+    --red:#e0564a; --gold:#d6b064; --line:#3e3428; --chip:#2a231b; --shu:#e0776a; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6;
+  font-family:"Noto Serif SC","Songti SC","PingFang SC","Microsoft YaHei",serif}
+main{max-width:820px;margin:0 auto;padding:26px 18px 48px}
+h1{font-size:clamp(2rem,7vw,3rem);margin:0;letter-spacing:.14em;color:var(--red);
+  font-family:"STKaiti","KaiTi",serif}
+.sub{color:var(--muted);margin:6px 0 16px;font-size:.95rem}
+.skill{border-left:3px solid var(--red);padding:10px 14px;background:var(--paper);
+  font-size:.9rem;margin-bottom:18px;border-radius:0 6px 6px 0}
+.skill b{color:var(--red)}
+.draw{display:block;width:100%;padding:14px;font:inherit;font-size:1.25rem;font-weight:900;letter-spacing:.3em;
+  background:var(--red);color:#fff8ec;border:none;border-radius:8px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.draw:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.row{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.link{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;
+  padding:3px 12px;font:inherit;font-size:.85rem;cursor:pointer}
+.link:hover{border-color:var(--gold);color:var(--gold)}
+.stage{display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px;align-items:start;
+  background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px;margin:22px 0 10px;min-height:150px}
+@media (max-width:620px){.stage{grid-template-columns:1fr}}
+.pic{display:block;aspect-ratio:1098/1542;border-radius:8px;overflow:hidden;background:var(--chip);border:1px solid var(--line)}
+.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.pic.empty{display:grid;place-items:center;color:var(--muted);font-size:.9rem;border-style:dashed}
+.who h2{margin:0;font-size:1.6rem;font-family:"STKaiti","KaiTi",serif;letter-spacing:.1em;color:var(--shu)}
+.who .title{color:var(--muted);font-size:.9rem;margin:2px 0 10px;letter-spacing:.1em}
+.sk{margin:0 0 8px;font-size:.88rem}
+.sk b{color:var(--gold);font-family:"STKaiti","KaiTi",serif;font-size:1rem;letter-spacing:.08em;margin-right:6px}
+.pool{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:.9rem;margin-top:18px}
+.pool span{display:inline-block;margin:2px 10px 2px 0}
+.pool .cur{color:var(--red);font-weight:700}
+.hist{margin-top:16px;font-size:.88rem;color:var(--muted)}
+.hist ol{margin:6px 0 0;padding-left:1.6em}
+.note{color:var(--muted);font-size:.82rem;margin-top:14px}
+</style>
+</head>
+<body><nav id="sgs-backbar" style="position:fixed;top:10px;left:10px;z-index:2147483000;display:flex;gap:2px;font:13px/1 'PingFang SC','Microsoft YaHei',sans-serif;background:rgba(18,16,21,.82);backdrop-filter:blur(6px);border:1px solid rgba(214,170,85,.45);border-radius:999px;padding:3px;box-shadow:0 4px 14px rgba(0,0,0,.25)"><a href="../../" style="color:#f0cf85;text-decoration:none;padding:6px 10px;border-radius:999px">← 图鉴</a><a href="../" style="color:#ece6da;text-decoration:none;padding:6px 10px;border-radius:999px">模拟器</a></nav><style>@media (max-width:1000px){body{padding-top:52px !important}}</style>
+<main>
+  <h1>任贤</h1>
+  <p class="sub">谋刘禅 · 季汉辅臣随机</p>
+
+  <div class="skill">出牌阶段结束时，你可以展示所有手牌，并将除【闪】外的所有基本牌（至少一张）交给一名其他角色。若如此做，本回合结束后，其执行一个只有出牌阶段的额外回合。</div>
+
+  <button class="draw" id="draw">任 贤</button>
+  <div class="row">
+    <button class="link" id="again">再抽一位</button>
+    <button class="link" id="reset">重置（允许重复）</button>
+    <span class="note" id="left"></span>
+  </div>
+
+  <section class="stage">
+    <div class="pic empty" id="pic">点上方按钮</div>
+    <div class="who" id="who"><h2>—</h2><p class="title">尚未抽取</p></div>
+  </section>
+
+  <div class="pool" id="pool"></div>
+
+  <div class="hist">记录<ol id="hist" reversed></ol></div>
+  <p class="note">卡图与技能取自本站图鉴，点卡图可查看该武将详情。</p>
+</main>
+<script>
+var POOL = ["合赵云", "武诸葛亮", "势魏延", "界姜维", "费祎", "蒋琬", "谋马谡", "谋廖化", "星夏侯霸", "张嶷"];
+
+var byName = {}, drawn = [], current = null, n = 0;
+function $(s) { return document.querySelector(s); }
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+function rnd(k) { var a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % k; }
+
+// 不放回抽取：抽完十位后提示重置
+function pick() {
+  var rest = POOL.filter(function (x) { return drawn.indexOf(x) < 0; });
+  if (!rest.length) { $("#left").textContent = "十位辅臣已抽完，可点「重置」重新开始"; return null; }
+  var name = rest[rnd(rest.length)];
+  drawn.push(name);
+  return name;
+}
+
+function render() {
+  var name = current, c = name && byName[name];
+  $("#pic").outerHTML = c && c.img
+    ? '<a class="pic" id="pic" href="../../generals/' + encodeURIComponent(c.slug) + '/" title="查看详情">' +
+      '<img src="../../img/thumb/' + encodeURIComponent(c.slug) + '.webp" alt="' + esc(name) + '"></a>'
+    : '<div class="pic empty" id="pic">' + (name ? esc(name) : "点上方按钮") + "</div>";
+  $("#who").innerHTML = c
+    ? "<h2>" + esc(c.name) + "</h2><p class=\"title\">" + esc(c.title) + "　♥" +
+      (c.hp === c.maxHp ? c.maxHp : c.hp + "/" + c.maxHp) + "</p>" +
+      c.skills.map(function (s) { return '<p class="sk"><b>' + esc(s.n) + "</b>" + esc(s.t) + "</p>"; }).join("")
+    : "<h2>" + (name ? esc(name) : "—") + '</h2><p class="title">' + (name ? "图鉴中暂无此武将" : "尚未抽取") + "</p>";
+  $("#pool").innerHTML = POOL.map(function (x) {
+    var cls = x === current ? "cur" : (drawn.indexOf(x) > -1 ? "" : "");
+    var used = drawn.indexOf(x) > -1 && x !== current;
+    return '<span class="' + cls + '" style="' + (used ? "opacity:.45;text-decoration:line-through" : "") + '">' + esc(x) + "</span>";
+  }).join("");
+  var left = POOL.length - drawn.length;
+  $("#left").textContent = left ? "剩余 " + left + " 位未抽" : "十位辅臣已抽完，可点「重置」";
+}
+
+function draw() {
+  var name = pick();
+  if (!name) return;
+  current = name;
+  n++;
+  $("#hist").insertAdjacentHTML("afterbegin", '<li value="' + n + '">' + esc(name) + "</li>");
+  render();
+}
+
+$("#draw").onclick = draw;
+$("#again").onclick = draw;
+$("#reset").onclick = function () { drawn = []; current = null; render(); };
+
+render();
+fetch("../../data/generals.json")
+  .then(function (r) { return r.json(); })
+  .then(function (d) {
+    d.cards.forEach(function (c) { if (c.kind === "general" && !byName[c.name]) byName[c.name] = c; });
+    render();
+  })
+  .catch(function () { $("#left").textContent = "卡图加载失败，名字仍可正常随机"; });
+</script>
+</body>
+</html>
